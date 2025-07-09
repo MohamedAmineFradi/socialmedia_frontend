@@ -15,7 +15,6 @@ export default function Home() {
             className="rounded-3xl shadow-2xl"
           />
         </div>
-        {/* Description section (right on desktop, bottom on mobile) */}
         <div className="flex-1 flex flex-col items-center md:items-start justify-center gap-6 bg-white/80 rounded-3xl shadow-lg px-8 py-12 max-w-xl w-full mx-4">
           <h1 className="text-4xl font-bold text-[#ff9800] text-center md:text-left drop-shadow-sm">Libertalk</h1>
           <p className="text-lg text-[#fbc02d] font-medium text-center md:text-left max-w-md">
