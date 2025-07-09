@@ -1,4 +1,3 @@
-// src/components/WhoToFollow.js
 import { useState, useMemo } from "react";
 
 /* ---------- reusable hook ---------- */
@@ -9,6 +8,7 @@ function useSearch(data, keys = ["name", "username"]) {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return data;
+
     return data.filter((item) =>
         keys.some((k) => item[k].toLowerCase().includes(q))
     );
@@ -23,23 +23,44 @@ export default function WhoToFollow() {
   const [suggested, setSuggested] = useState([
     {
       id: 1,
-      name: "Jennifer anniston",
-      username: "Jen_anniston",
-      avatar: "https://i.pravatar.cc/80?img=47",
+      name: "Jennifer Aniston",
+      username: "jen_aniston",
+      avatar: "https://duckduckgo.com/i/7417751969c0e845.jpg",
       followed: false,
     },
     {
       id: 2,
-      name: "Lisa kuredov",
-      username: "i_dont_have_a_pla",
-      avatar: "https://i.pravatar.cc/80?img=32",
+      name: "Courteney Cox",
+      username: "courteneycoxofficial",
+      avatar: "https://duckduckgo.com/i/da6ce57098a7bd35.jpg",
       followed: false,
     },
     {
       id: 3,
-      name: "Matt le blanc",
-      username: "Mat_le_blanc",
-      avatar: "https://i.pravatar.cc/80?img=53",
+      name: "Lisa Kudrow",
+      username: "lisa.kudrow",
+      avatar: "https://duckduckgo.com/i/a7b5e2645d8b3427.jpg",
+      followed: false,
+    },
+    {
+      id: 4,
+      name: "Matt LeBlanc",
+      username: "mattleblanc",
+      avatar: "https://duckduckgo.com/i/0bbc05d0a441eee4.jpg",
+      followed: false,
+    },
+    {
+      id: 5,
+      name: "Matthew Perry",
+      username: "matthewperry",
+      avatar: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.dlJgA-DP9JS8VA0fcYUhwwHaJb%3Fpid%3DApi&f=1&ipt=f5be0386e2bc5a17e4939fc47a387a8fa5f0affa3af0c722cce03336cfa36238&ipo=images",
+      followed: false,
+    },
+    {
+      id: 6,
+      name: "David Schwimmer",
+      username: "david_schwimmer",
+      avatar: "https://duckduckgo.com/i/0bbc05d0a441eee4.jpg",
       followed: false,
     },
   ]);

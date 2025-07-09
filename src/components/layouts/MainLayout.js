@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import RightSidebar from "../sidebar/RightSidebar";
-import SuggestionsSidebar from "../sidebar/SuggestionsSidebar";
 import ChatDrawer from "../chat/ChatDrawer";
 import WhoToFollow from "../sidebar/WhoToFollow";
 import Navigation from "@/components/sidebar/Navigation";
@@ -37,7 +36,6 @@ export default function MainLayout({ children }) {
 
       <aside className="hidden lg:flex flex-col space-y-6 overflow-y-auto scrollbar-thin scrollbar-thumb-[#009ddb]/30 bg-white shadow-sm rounded-2xl p-6 h-full">
         <RightSidebar />
-        <SuggestionsSidebar />
         <WhoToFollow />
       </aside>
 

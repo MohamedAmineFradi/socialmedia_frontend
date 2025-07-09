@@ -41,35 +41,7 @@ const Navigation = () => {
                 <Logo />
             </div>
 
-            {/* Profile Section */}
-            <div className="hidden lg:block w-full mb-6">
-                <div className="px-4 mb-4">
-                    <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Profile</h3>
-                </div>
-                <div className="px-2">
-                    <ProfileSidebar />
-                    <a
-                        href="/me"
-                        className="flex items-center w-full px-4 py-3 mb-2 text-left rounded-lg transition-all duration-200 group hover:bg-white/20"
-                    >
-                        <span className="text-xl mr-3 group-hover:scale-110 transition-transform">👤</span>
-                        <div>
-                            <span className="block font-medium">Your Profile</span>
-                            <span className="block text-xs text-white/70">View and edit posts</span>
-                        </div>
-                    </a>
-                    <button
-                        className="flex items-center w-full px-4 py-3 text-left bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-all duration-200 group"
-                    >
-                        <span className="text-xl mr-3 group-hover:scale-110 transition-transform">🔒</span>
-                        <div>
-                            <span className="block font-medium">Sign Out</span>
-                            <span className="block text-xs text-white/70">End your session</span>
-                        </div>
-                    </button>
-                </div>
-            </div>
-
+    
             {/* Navigation List */}
             <div className="hidden lg:block w-full">
                 <div className="px-4 mb-4">
