@@ -34,3 +34,26 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Components Directory Structure
+
+The `src/components` directory is organized by feature/domain for maximum modularity and maintainability. Each folder contains all UI and logic for that domain. Only truly generic UI elements are in `ui/`, and layouts are in `layouts/`.
+
+```
+components/
+  ui/                # Pure, reusable UI atoms/molecules (Button, Footer, Logo, etc.)
+  layouts/           # Page or section layouts (MainLayout, etc.)
+  posts/             # All post and comment-related components
+  profile/           # Profile page, header, stats, sidebar, etc.
+  sidebar/           # Sidebars (WhoToFollow, RightSidebar, etc.)
+  nav/               # Navigation (Navigation.js, IconRail.js, etc.)
+  notifications/     # Notification drawer, notification item, etc.
+  chat/              # Messaging/DM drawer, chat bubbles, etc.
+  forms/             # Generic, reusable form components (if any)
+```
+
+**Guidelines:**
+- Group by feature/domain, not by type.
+- Encapsulate all feature UI/logic in its folder.
+- Only generic UI in `ui/`.
+- No cross-feature imports except through `ui/` or `layouts/`.

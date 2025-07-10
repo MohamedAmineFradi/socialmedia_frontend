@@ -5,6 +5,8 @@ import { useState } from "react";
 import PostHeader from "./PostHeader";
 import PostContent from "./PostContent";
 import PostFooter from "./PostFooter";
+import SocialShareModal from "@/components/ui/SocialShareModal";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 const currentUserId = 1; // Simulated logged-in user
 
@@ -15,10 +17,12 @@ export default function PostCard({
   onClosePicker,
   onPickReaction,
   onCommentsClick,
+  isCommentsOpen,
   onEdit,
   onDelete,
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const isOwn = post.authorId === currentUserId;
 
   function handleEditStart() {
@@ -37,9 +41,18 @@ export default function PostCard({
   }
 
   function handleDelete() {
+    setShowDeleteModal(true);
+  }
+
+  function confirmDelete() {
     if (onDelete) {
       onDelete(post.id);
     }
+    setShowDeleteModal(false);
+  }
+
+  function cancelDelete() {
+    setShowDeleteModal(false);
   }
 
   function handleLike() {
@@ -88,7 +101,20 @@ export default function PostCard({
         commentCount={post.commentCount || 0}
         onLike={handleLike}
         onDislike={handleDislike}
-        onCommentsClick={() => onCommentsClick(post.id)}
+        onCommentsClick={onCommentsClick}
+        isCommentsOpen={isCommentsOpen}
+      />
+      <div className="flex justify-end mt-2">
+        <SocialShareModal url={post.url} title={post.title || post.author} description={post.content} />
+      </div>
+      <ConfirmModal
+        open={showDeleteModal}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        title="Delete Post"
+        description="Are you sure you want to delete this post? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
       />
     </article>
   );

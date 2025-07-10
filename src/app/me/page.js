@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import UserStats from "@/components/profile/UserStats";
 import UserPostsList from "@/components/posts/UserPostsList";
-import CommentsDrawer from "@/components/posts/CommentsDrawer";
+import CommentsModal from "@/components/posts/comments/CommentsModal";
 
 export default function ProfilePage() {
   return (

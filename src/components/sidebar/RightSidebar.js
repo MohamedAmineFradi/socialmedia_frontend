@@ -1,4 +1,4 @@
-import ProfileSidebar from "../nav/ProfileSidebar";
+import ProfileSidebar from "../profile/ProfileSidebar";
 
 export default function RightSidebar() {
 

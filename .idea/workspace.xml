@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b249c07a-2a41-4cfe-9f6e-737c8f95d7bd" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/me/page.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/me/page.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/chat/ChatDrawer.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/chat/ChatDrawer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/layouts/MainLayout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/layouts/MainLayout.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/nav/Logo.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/nav/ProfileSidebar.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/posts/CommentForm.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/posts/CommentItem.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/posts/CommentsDrawer.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/posts/Feed.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/posts/Feed.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/posts/PostCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/posts/PostCard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/posts/PostFooter.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/posts/PostFooter.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/posts/UserPostsList.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/posts/UserPostsList.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sidebar/Navigation.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sidebar/RightSidebar.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sidebar/RightSidebar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/localDataService.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/localDataService.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="2zXL4mwdEVniSB6filHfTCzdJE9" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Node.js.layout.js.executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.page.js.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
+    &quot;js.debugger.nextJs.config.created.server&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.Next.js: server-side.executor&quot;: &quot;Run&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\aminf\OneDrive\Bureau\socialMedia\front_end_social_media\src\components\nav" />
+      <recent name="C:\Users\aminf\OneDrive\Bureau\socialMedia\front_end_social_media\src\components\sidebar" />
+      <recent name="C:\Users\aminf\OneDrive\Bureau\socialMedia\front_end_social_media\src\app" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.Next.js: server-side">
+    <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
+      <method v="2" />
+    </configuration>
+    <configuration name="Next.js: server-side" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.26927.53" />
+        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-IU-251.26927.53" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b249c07a-2a41-4cfe-9f6e-737c8f95d7bd" name="Changes" comment="" />
+      <created>1751872284736</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1751872284736</updated>
+      <workItem from="1751872285867" duration="7121000" />
+      <workItem from="1751974548932" duration="9968000" />
+      <workItem from="1752049182716" duration="14291000" />
+      <workItem from="1752067915325" duration="3760000" />
+      <workItem from="1752133158097" duration="7075000" />
+      <workItem from="1752145283014" duration="6643000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/components/posts/comments/CommentsModal.js</url>
+          <line>2</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

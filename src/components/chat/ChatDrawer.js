@@ -13,7 +13,7 @@ function ChatList() {
     <section className="bg-white rounded-2xl shadow p-4 border border-[#009ddb]/10 max-h-full flex flex-col">
       <h3 className="text-md font-bold text-[#009ddb] mb-4">Messages</h3>
       {/* Scrollable list */}
-      <ul className="space-y-3 overflow-y-auto pr-1 flex-1">
+      <ul className="space-y-3 overflow-y-auto pr-1 flex-1 scrollbar-hide">
         {conversations.map((c, idx) => (
           <li
             key={idx}

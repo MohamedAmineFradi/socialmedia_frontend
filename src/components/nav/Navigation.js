@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Logo from "@/components/nav/Logo";
-import ProfileSidebar from "@/components/nav/ProfileSidebar";
+import Logo from "@/components/ui/Logo";
+import ProfileSidebar from "@/components/profile/ProfileSidebar";
 
 const Navigation = () => {
     const [isOpen, setIsOpen] = useState(false);

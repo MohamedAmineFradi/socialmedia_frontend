@@ -7,50 +7,53 @@ export default function CommentItem({
   comment, 
   isPostOwner, 
   currentUserId, 
-  onEdit, 
+  isEditing,
+  editValue,
+  onEditStart,
+  onEditCancel,
+  onEditSave,
+  onEditChange,
   onDelete 
 }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState(comment.text);
-
-  function handleEditStart() {
-    setIsEditing(true);
-    setEditContent(comment.text);
-  }
-
-  function handleEditCancel() {
-    setIsEditing(false);
-  }
+  // Remove local isEditing/editContent state
 
   function handleEditSave() {
-    onEdit(comment.id, editContent);
-    setIsEditing(false);
+    onEditSave(comment.id, editValue);
   }
 
   function handleDelete() {
     onDelete(comment.id);
   }
 
+  const avatarUrl = comment.avatar || "https://ui-avatars.com/api/?name=" + encodeURIComponent(comment.author);
+
   return (
     <div className="flex items-start gap-3">
-      <div className="w-8 h-8 rounded-full bg-[#009ddb]" />
+      <img
+        src={avatarUrl}
+        alt={comment.author}
+        className="w-8 h-8 rounded-full object-cover bg-white/20 border border-white/30"
+        loading="lazy"
+      />
       <div className="flex-1">
         <div className="flex items-center justify-between">
-          <p className="text-sm">
-            <span className="font-semibold text-[#009ddb]">
+          <div>
+            <span className="font-semibold text-white">
               {comment.author}
-            </span>{" "}
-            <span className="text-gray-400 text-xs">
+            </span>
+            {comment.username && (
+              <span className="ml-2 text-xs text-white/60">{comment.username}</span>
+            )}
+            <span className="ml-2 text-white/70 text-xs">
               {comment.minutesAgo} min ago
             </span>
-          </p>
-          
+          </div>
           {(comment.authorId === currentUserId || isPostOwner) && !isEditing && (
             <div className="flex gap-2">
               {comment.authorId === currentUserId && (
                 <button 
-                  onClick={handleEditStart} 
-                  className="text-sm px-1.5 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-gray-700" 
+                  onClick={onEditStart} 
+                  className="text-sm px-1.5 py-0.5 rounded bg-white/20 hover:bg-white/30 text-white" 
                   title="Edit"
                 >
                   ✒️
@@ -58,7 +61,7 @@ export default function CommentItem({
               )}
               <button 
                 onClick={handleDelete} 
-                className="text-sm px-1.5 py-0.5 rounded bg-red-100 hover:bg-red-200 text-red-700" 
+                className="text-sm px-1.5 py-0.5 rounded bg-red-400/20 hover:bg-red-400/40 text-white" 
                 title="Delete"
               >
                 ❌
@@ -66,33 +69,32 @@ export default function CommentItem({
             </div>
           )}
         </div>
-        
         {isEditing ? (
           <div className="mt-1">
             <textarea 
-              value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#009ddb] text-sm"
+              value={editValue}
+              onChange={(e) => onEditChange(e.target.value)}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#fde848] text-sm bg-white text-[#009ddb]"
               rows={2}
             />
             <div className="flex justify-end gap-2 mt-1">
               <button 
-                onClick={handleEditCancel}
-                className="px-2 py-0.5 text-xs rounded bg-gray-100 hover:bg-gray-200"
+                onClick={onEditCancel}
+                className="px-2 py-0.5 text-xs rounded bg-white/20 hover:bg-white/30 text-white"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleEditSave}
-                className="px-2 py-0.5 text-xs rounded bg-[#009ddb] hover:bg-[#0089c3] text-white"
-                disabled={!editContent.trim()}
+                className="px-2 py-0.5 text-xs rounded bg-[#fde848] hover:bg-[#fb5c1d] text-[#009ddb]"
+                disabled={!editValue.trim()}
               >
                 Save
               </button>
             </div>
           </div>
         ) : (
-          <p className="text-gray-700 text-sm whitespace-pre-line">
+          <p className="text-white text-sm whitespace-pre-line">
             {comment.text}
           </p>
         )}

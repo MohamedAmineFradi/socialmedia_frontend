@@ -70,7 +70,7 @@ const DEFAULT_USER_DATA = {
         },
       ],
     },
-  ],
+  ],  
   following: [
     { id: 2, name: "Jane Doe", username: "@janedoe" },
     { id: 3, name: "Mike Smith", username: "@mikesmith" },
@@ -137,7 +137,7 @@ export const addPost = (postContent) => {
   const userData = getUserData();
   
   const newPost = {
-    id: Date.now(),
+    id: `${Date.now()}_${Math.floor(Math.random() * 1000000)}`,
     author: userData.profile.name,
     authorId: userData.profile.id,
     minutesAgo: 0,
@@ -196,7 +196,7 @@ export const addComment = (postId, commentContent) => {
   const userData = getUserData();
   
   const newComment = {
-    id: Date.now(),
+    id: `${Date.now()}_${Math.floor(Math.random() * 1000000)}`,
     author: userData.profile.name,
     authorId: userData.profile.id,
     content: commentContent,

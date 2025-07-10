@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import PostCard from "./PostCard";
-import CommentsDrawer from "./CommentsDrawer";
+import CommentsModal from "./comments/CommentsModal";
 import PostForm from "./PostForm";
 import { addPost, editPost, deletePost, addReaction, addComment } from "@/utils/localDataService";
+import InlineComments from "./comments/InlineComments";
 // import 'long-press-event';
 
 const currentUserId = 1; // Simulated logged-in user
@@ -19,6 +20,7 @@ export default function Feed({ initialPosts = [] }) {
   const [posts, setPosts] = useState(initialPosts);
   const [pickerPostId, setPickerPostId] = useState(null);
   const [commentsPostId, setCommentsPostId] = useState(null);
+  const [openComments, setOpenComments] = useState({});
 
   function handlePublish(content) {
     // Add post to local storage (handled in PostForm)
@@ -36,7 +38,7 @@ export default function Feed({ initialPosts = [] }) {
   }
 
   function handleCommentsClick(postId) {
-    setCommentsPostId(postId);
+    setOpenComments((prev) => ({ ...prev, [postId]: !prev[postId] }));
   }
 
   function handleCloseComments() {
@@ -84,17 +86,47 @@ export default function Feed({ initialPosts = [] }) {
   }
 
   // Comment CRUD
-  function handleAddComment(postId) {
-    // Update UI
+  function handleAddComment(postId, commentObj) {
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
-        post.id === postId ? { ...post, commentCount: (post.commentCount || 0) + 1 } : post
+        post.id === postId
+          ? { ...post, comments: [...(post.comments || []), commentObj], commentCount: (post.commentCount || 0) + 1 }
+          : post
+      )
+    );
+  }
+
+  function handleEditComment(postId, commentId, newText) {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === postId
+          ? {
+              ...post,
+              comments: post.comments.map((c) =>
+                c.id === commentId ? { ...c, content: newText } : c
+              ),
+            }
+          : post
+      )
+    );
+  }
+
+  function handleDeleteComment(postId, commentId) {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === postId
+          ? {
+              ...post,
+              comments: post.comments.filter((c) => c.id !== commentId),
+              commentCount: Math.max(0, (post.commentCount || 1) - 1),
+            }
+          : post
       )
     );
   }
 
   return (
-    <div className="relative flex flex-col gap-6 min-h-[600px]">
+    <div className="relative flex flex-col gap-6 min-h-[600px] scrollbar-hide">
       {/* Background Logo */}
       <div className="pointer-events-none select-none absolute inset-0 flex items-center justify-center z-0">
         <Image
@@ -135,17 +167,18 @@ export default function Feed({ initialPosts = [] }) {
                 onEdit={handleEditPost}
                 onDelete={handleDeletePost}
               />
+              {openComments[post.id] && (
+                <InlineComments
+                  post={post}
+                  onAddComment={handleAddComment}
+                  onEditComment={handleEditComment}
+                  onDeleteComment={handleDeleteComment}
+                />
+              )}
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
-      {/* Comments Drawer */}
-      <CommentsDrawer
-        open={commentsPostId !== null}
-        onClose={handleCloseComments}
-        post={posts.find((p) => p.id === commentsPostId)}
-        onAddComment={() => handleAddComment(commentsPostId)}
-      />
     </div>
   );
 }

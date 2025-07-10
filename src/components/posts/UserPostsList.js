@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import PostCard from "./PostCard";
-import CommentsDrawer from "./CommentsDrawer";
+import CommentsModal from "./comments/CommentsModal";
 import { 
   getUserPosts, 
   editPost, 
@@ -81,7 +81,7 @@ export default function UserPostsList() {
   }
 
   function handleAddComment(postId) {
-    // Update local storage is handled in CommentsDrawer
+    // Update local storage is handled in CommentsModal
     
     // Update UI
     setUserPosts((prevPosts) =>
@@ -94,7 +94,7 @@ export default function UserPostsList() {
   if (userPosts.length === 0) {
     return (
       <div className="bg-white rounded-2xl shadow p-6 text-center">
-        <p className="text-gray-500">You haven't created any posts yet.</p>
+        <p className="text-gray-500">You haven&apos;t created any posts yet.</p>
         <button 
           onClick={() => window.location.href = '/posts'}
           className="mt-4 bg-[#fb5c1d] hover:bg-[#fa5c1a] text-white font-bold py-2 px-6 rounded-full transition-colors"
@@ -132,7 +132,7 @@ export default function UserPostsList() {
       </AnimatePresence>
 
       {/* Comments Drawer */}
-      <CommentsDrawer
+      <CommentsModal
         open={commentsPostId !== null}
         onClose={handleCloseComments}
         post={userPosts.find((p) => p.id === commentsPostId)}
