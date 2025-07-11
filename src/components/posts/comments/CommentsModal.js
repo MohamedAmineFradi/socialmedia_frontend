@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import CommentItem from "./CommentItem";
 import CommentModal from "./CommentModal";
-import { addComment, editComment, deleteComment, getUserPosts } from "@/utils/localDataService";
+import { addComment, editComment, deleteComment } from "@/services/commentService";
+import { getProfileByUserId } from "@/services/profileService";
 import CommentForm from "./CommentForm";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { getUserProfile } from "@/utils/localDataService";
 
 const currentUserId = 1; // Simulated logged-in user
 
@@ -29,20 +29,10 @@ export default function CommentsModal({ open, onClose, post, onAddComment, onEdi
 
   if (!open) return null;
 
-  function handleAddComment(text) {
+  async function handleAddComment(text) {
     if (!post) return;
-    // Generate a new comment object (with avatar, etc.)
-    const user = { ...post, ...post.profile };
-    const tempId = `temp_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
-    const commentObj = {
-      id: tempId,
-      author: user.author || user.name,
-      authorId: user.authorId || user.id,
-      avatar: user.avatar,
-      content: text,
-      minutesAgo: 0,
-    };
-    onAddComment(post.id, commentObj);
+    await addComment(post.id, 1, { content: text }); // Static userId 1 for now
+    if (onAddComment) onAddComment(post.id, text);
   }
 
   function handleEditStart(comment) {
@@ -55,9 +45,10 @@ export default function CommentsModal({ open, onClose, post, onAddComment, onEdi
     setEditingValue("");
   }
 
-  function handleEditSave(commentId, newText) {
+  async function handleEditSave(commentId, newText) {
     if (!post) return;
-    onEditComment(post.id, commentId, newText);
+    await editComment(commentId, 1, { content: newText });
+    if (onEditComment) onEditComment(post.id, commentId, newText);
     setEditingId(null);
     setEditingValue("");
   }
@@ -66,9 +57,10 @@ export default function CommentsModal({ open, onClose, post, onAddComment, onEdi
     setDeleteId(commentId);
   }
 
-  function confirmDeleteComment() {
+  async function confirmDeleteComment() {
     if (!post || !deleteId) return;
-    onDeleteComment(post.id, deleteId);
+    await deleteComment(deleteId, 1);
+    if (onDeleteComment) onDeleteComment(post.id, deleteId);
     setDeleteId(null);
   }
 

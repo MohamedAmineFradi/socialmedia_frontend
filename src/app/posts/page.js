@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from "react";
 import Feed from "../../components/posts/Feed";
-import { getUserPosts } from "@/utils/localDataService";
+import { getPosts } from "@/services/postService";
 
 export default function PostsPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get posts from local storage
-    const userPosts = getUserPosts();
-    setPosts(userPosts);
-    setLoading(false);
+    getPosts().then((data) => {
+      setPosts(data);
+      setLoading(false);
+    });
   }, []);
 
   if (loading) {

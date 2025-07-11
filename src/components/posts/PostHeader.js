@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 
 export default function PostHeader({ 
   author, 
+  avatar,
+  username,
   minutesAgo, 
   isOwn, 
   isEditing,
@@ -12,10 +14,21 @@ export default function PostHeader({
 }) {
   return (
     <header className="flex items-center gap-3 mb-2">
-      <div className="w-10 h-10 rounded-full bg-[#009ddb]" />
+      {avatar ? (
+        <img
+          src={avatar}
+          alt={author}
+          className="w-10 h-10 rounded-full object-cover bg-white"
+        />
+      ) : (
+        <div className="w-10 h-10 rounded-full bg-[#009ddb]" />
+      )}
       <div>
         <h4 className="font-bold text-[#009ddb]">{author}</h4>
-        <time className="text-xs text-gray-400">{minutesAgo} min ago</time>
+        {username && (
+          <span className="ml-2 text-xs text-gray-400">@{username}</span>
+        )}
+        <time className="block text-xs text-gray-400">{minutesAgo} min ago</time>
       </div>
       
       {/* Edit/Delete buttons */}
@@ -43,6 +56,8 @@ export default function PostHeader({
 
 PostHeader.propTypes = {
   author: PropTypes.string.isRequired,
+  avatar: PropTypes.string,
+  username: PropTypes.string,
   minutesAgo: PropTypes.number.isRequired,
   isOwn: PropTypes.bool.isRequired,
   isEditing: PropTypes.bool.isRequired,

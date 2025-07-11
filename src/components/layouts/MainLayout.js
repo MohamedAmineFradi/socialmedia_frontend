@@ -10,13 +10,6 @@ import Footer from "@/components/ui/Footer";
 
 export default function MainLayout({ children }) {
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
 
   const isHome = pathname === "/";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getUserStats } from "@/utils/localDataService";
+// TODO: Replace with real backend stats API when available
 
 export default function UserStats() {
   const [stats, setStats] = useState({
@@ -13,9 +13,8 @@ export default function UserStats() {
   });
 
   useEffect(() => {
-    // Get stats from local storage
-    const userStats = getUserStats();
-    setStats(userStats);
+    // Placeholder: set all stats to 0 or fetch from backend if available
+    setStats({ posts: 0, comments: 0, likes: 0, followers: 0, following: 0 });
   }, []);
 
   return (

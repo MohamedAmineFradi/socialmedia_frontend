@@ -6,8 +6,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import PostCard from "./PostCard";
 import CommentsModal from "./comments/CommentsModal";
 import PostForm from "./PostForm";
-import { addPost, editPost, deletePost, addReaction, addComment } from "@/utils/localDataService";
+import { getPosts, addPost as addPostApi, editPost as editPostApi, deletePost as deletePostApi, addReaction as addReactionApi, deleteReaction as deleteReactionApi } from "@/services/postService";
+import { getComments, addComment as addCommentApi, editComment as editCommentApi, deleteComment as deleteCommentApi } from "@/services/commentService";
 import InlineComments from "./comments/InlineComments";
+import usePosts from "@/hooks/usePosts";
 // import 'long-press-event';
 
 const currentUserId = 1; // Simulated logged-in user
@@ -16,23 +18,27 @@ export default function Feed({ initialPosts = [] }) {
   useEffect(() => {
     import('long-press-event');
   }, []);
-  
-  const [posts, setPosts] = useState(initialPosts);
+
   const [pickerPostId, setPickerPostId] = useState(null);
   const [commentsPostId, setCommentsPostId] = useState(null);
   const [openComments, setOpenComments] = useState({});
 
-  function handlePublish(content) {
-    // Add post to local storage (handled in PostForm)
-    // Just update UI here
-    const newPost = addPost(content);
-    setPosts([newPost, ...posts]);
-  }
+  const {
+    posts,
+    pendingReaction,
+    handlePublish,
+    handleEditPost,
+    handleDeletePost,
+    handlePickReaction,
+    handleAddComment,
+    handleEditComment,
+    handleDeleteComment,
+  } = usePosts(currentUserId, initialPosts);
 
   function handleLongPress(postId) {
     setPickerPostId(postId);
   }
-  
+
   function handleClosePicker() {
     setPickerPostId(null);
   }
@@ -43,86 +49,6 @@ export default function Feed({ initialPosts = [] }) {
 
   function handleCloseComments() {
     setCommentsPostId(null);
-  }
-
-  function handlePickReaction(postId, emoji) {
-    // Update in local storage
-    addReaction(postId, emoji);
-    
-    // Update UI
-    setPosts((prevPosts) =>
-      prevPosts.map((post) => {
-        if (post.id !== postId) return post;
-        if (emoji === "👍") {
-          return { ...post, likes: post.likes + 1 };
-        } else if (emoji === "👎") {
-          return { ...post, dislikes: post.dislikes + 1 };
-        }
-        return post;
-      })
-    );
-    setPickerPostId(null);
-  }
-
-  // Post CRUD
-  function handleEditPost(postId, newContent) {
-    // Update in local storage
-    editPost(postId, newContent);
-    
-    // Update UI
-    setPosts(posts.map(post => 
-      post.id === postId 
-        ? { ...post, content: newContent }
-        : post
-    ));
-  }
-
-  function handleDeletePost(postId) {
-    // Update in local storage
-    deletePost(postId);
-    
-    // Update UI
-    setPosts(posts.filter(post => post.id !== postId));
-  }
-
-  // Comment CRUD
-  function handleAddComment(postId, commentObj) {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? { ...post, comments: [...(post.comments || []), commentObj], commentCount: (post.commentCount || 0) + 1 }
-          : post
-      )
-    );
-  }
-
-  function handleEditComment(postId, commentId, newText) {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              comments: post.comments.map((c) =>
-                c.id === commentId ? { ...c, content: newText } : c
-              ),
-            }
-          : post
-      )
-    );
-  }
-
-  function handleDeleteComment(postId, commentId) {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              comments: post.comments.filter((c) => c.id !== commentId),
-              commentCount: Math.max(0, (post.commentCount || 1) - 1),
-            }
-          : post
-      )
-    );
   }
 
   return (
@@ -148,7 +74,7 @@ export default function Feed({ initialPosts = [] }) {
 
         {/* Posts */}
         <AnimatePresence>
-          {posts.map((post) => (
+        {posts.map((post) => (
             <motion.div
               key={post.id}
               layout
@@ -166,6 +92,8 @@ export default function Feed({ initialPosts = [] }) {
                 onCommentsClick={() => handleCommentsClick(post.id)}
                 onEdit={handleEditPost}
                 onDelete={handleDeletePost}
+                userReaction={post.userReaction}
+                pendingReaction={pendingReaction[post.id]}
               />
               {openComments[post.id] && (
                 <InlineComments

@@ -5,30 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b249c07a-2a41-4cfe-9f6e-737c8f95d7bd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/globals.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/me/page.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/me/page.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/chat/ChatDrawer.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/chat/ChatDrawer.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/layouts/MainLayout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/layouts/MainLayout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/nav/Logo.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/nav/ProfileSidebar.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/posts/CommentForm.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/posts/CommentItem.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/posts/CommentsDrawer.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/posts/Feed.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/posts/Feed.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/posts/PostCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/posts/PostCard.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/posts/PostFooter.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/posts/PostFooter.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/posts/UserPostsList.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/posts/UserPostsList.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/sidebar/Navigation.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/sidebar/RightSidebar.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sidebar/RightSidebar.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/localDataService.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/localDataService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/settings/page.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/settings/page.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/profile/ProfileHeader.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/profile/ProfileHeader.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,27 +35,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Node.js.layout.js.executor&quot;: &quot;Run&quot;,
-    &quot;Node.js.page.js.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
-    &quot;js.debugger.nextJs.config.created.server&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.Next.js: server-side.executor&quot;: &quot;Run&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Node.js.layout.js.executor": "Run",
+    "Node.js.page.js.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "js.debugger.nextJs.config.created.client": "true",
+    "js.debugger.nextJs.config.created.server": "true",
+    "last_opened_file_path": "C:/Users/aminf/OneDrive/Bureau/socialMedia/front_end_social_media",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_interpreter_path": "node",
+    "nodejs_package_manager_path": "npm",
+    "npm.Next.js: server-side.executor": "Run",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\aminf\OneDrive\Bureau\socialMedia\front_end_social_media\src\components\nav" />
@@ -117,7 +99,9 @@
       <workItem from="1752049182716" duration="14291000" />
       <workItem from="1752067915325" duration="3760000" />
       <workItem from="1752133158097" duration="7075000" />
-      <workItem from="1752145283014" duration="6643000" />
+      <workItem from="1752145283014" duration="11501000" />
+      <workItem from="1752226473192" duration="106000" />
+      <workItem from="1752226589599" duration="105000" />
     </task>
     <servers />
   </component>
@@ -141,7 +125,6 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/src/components/posts/comments/CommentsModal.js</url>
           <line>2</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

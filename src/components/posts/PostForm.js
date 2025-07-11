@@ -2,7 +2,7 @@
 
 import PropTypes from "prop-types";
 import { useState } from "react";
-import { addPost } from "@/utils/localDataService";
+import { addPost } from "@/services/postService";
 
 export default function PostForm({ onSubmit }) {
   const [draft, setDraft] = useState("");
@@ -11,8 +11,8 @@ export default function PostForm({ onSubmit }) {
     e.preventDefault();
     if (!draft.trim()) return;
     
-    // Add post to local storage
-    const newPost = addPost(draft);
+    // Add post to backend
+    addPost(1, { content: draft }); // Use static userId 1 for now
     
     // Call parent component's onSubmit
     if (onSubmit) {

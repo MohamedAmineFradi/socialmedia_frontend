@@ -1,29 +1,35 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CommentItem from "./CommentItem";
 import CommentForm from "./CommentForm";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-
-const currentUserId = 1; // Simulated logged-in user
+import { getComments } from "@/services/commentService";
+import { getProfileByUserId } from "@/services/profileService";
+import { enrichCommentsWithProfiles, mapCommentResponseToUI } from "@/utils/profile";
+import { currentUserId } from "@/mocks/currentUser";
 
 export default function InlineComments({ post, onAddComment, onEditComment, onDeleteComment }) {
+  const [comments, setComments] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editingValue, setEditingValue] = useState("");
   const [deleteId, setDeleteId] = useState(null);
 
-  function handleAddComment(text) {
+  useEffect(() => {
+    if (post?.id) {
+      getComments(post.id).then(async (comments) => {
+        const commentsWithProfiles = await enrichCommentsWithProfiles(comments);
+        setComments(commentsWithProfiles);
+      });
+    }
+  }, [post?.id]);
+
+  async function handleAddComment(text) {
     if (!post) return;
-    const user = { ...post, ...post.profile };
-    const tempId = `temp_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
-    const commentObj = {
-      id: tempId,
-      author: user.author || user.name,
-      authorId: user.authorId || user.id,
-      avatar: user.avatar,
-      content: text,
-      minutesAgo: 0,
-    };
-    onAddComment(post.id, commentObj);
+    await onAddComment(post.id, text);
+    getComments(post.id).then(async (comments) => {
+      const commentsWithProfiles = await enrichCommentsWithProfiles(comments);
+      setComments(commentsWithProfiles);
+    });
   }
 
   function handleEditStart(comment) {
@@ -36,21 +42,29 @@ export default function InlineComments({ post, onAddComment, onEditComment, onDe
     setEditingValue("");
   }
 
-  function handleEditSave(commentId, newText) {
+  async function handleEditSave(commentId, newText) {
     if (!post) return;
-    onEditComment(post.id, commentId, newText);
+    await onEditComment(post.id, commentId, newText);
     setEditingId(null);
     setEditingValue("");
+    getComments(post.id).then(async (comments) => {
+      const commentsWithProfiles = await enrichCommentsWithProfiles(comments);
+      setComments(commentsWithProfiles);
+    });
   }
 
   function handleDeleteComment(commentId) {
     setDeleteId(commentId);
   }
 
-  function confirmDeleteComment() {
+  async function confirmDeleteComment() {
     if (!post || !deleteId) return;
-    onDeleteComment(post.id, deleteId);
+    await onDeleteComment(post.id, deleteId);
     setDeleteId(null);
+    getComments(post.id).then(async (comments) => {
+      const commentsWithProfiles = await enrichCommentsWithProfiles(comments);
+      setComments(commentsWithProfiles);
+    });
   }
 
   function cancelDeleteComment() {
@@ -60,10 +74,10 @@ export default function InlineComments({ post, onAddComment, onEditComment, onDe
   return (
     <div className="bg-[#009ddb] text-white rounded-2xl shadow-lg w-full mt-4 p-4">
       <div className="flex flex-col gap-4 max-h-[40vh] overflow-y-auto scrollbar-hide">
-        {(post.comments || []).map((comment) => (
+        {(comments || []).map((comment) => (
           <CommentItem
             key={comment.id}
-            comment={{ ...comment, text: comment.content }}
+            comment={mapCommentResponseToUI(comment)}
             isPostOwner={post?.authorId === currentUserId}
             currentUserId={currentUserId}
             isEditing={editingId === comment.id}

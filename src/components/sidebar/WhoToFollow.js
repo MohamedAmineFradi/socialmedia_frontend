@@ -46,7 +46,7 @@ export default function WhoToFollow() {
       id: 4,
       name: "Matt LeBlanc",
       username: "mattleblanc",
-      avatar: "https://duckduckgo.com/i/0bbc05d0a441eee4.jpg",
+      avatar: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.pinimg.com%2Foriginals%2F02%2F0c%2Fa2%2F020ca2e252ea1334767e47b4f15cd6ea.jpg&f=1&nofb=1&ipt=4ca4c0c74fe0f80fcb6e82efcdf5e477811836afaf1070b8e32594f75cc68808",
       followed: false,
     },
     {
