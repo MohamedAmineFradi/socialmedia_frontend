@@ -1,8 +1,15 @@
 import api from './api';
 
 export const getProfileByUserId = async (userId) => {
-  const { data } = await api.get(`/profiles/user/${userId}`);
-  return data;
+  console.log('Fetching profile for user ID:', userId);
+  try {
+    const { data } = await api.get(`/profiles/user/${userId}`);
+    console.log('Profile data received:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    throw error;
+  }
 };
 
 export const createProfileForUser = async (userId, profileData) => {

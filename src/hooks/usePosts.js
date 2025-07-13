@@ -50,27 +50,43 @@ export default function usePosts(currentUserId, initialPosts = []) {
     const post = posts.find(p => p.id === postId);
     const userReaction = post.userReaction;
     if (userReaction && userReaction.type === reactionType) {
-      // Defensive check and logging
+      // Remove reaction
       if (!userReaction.id) {
         console.error("userReaction.id is missing!", userReaction);
         setPendingReaction((prev) => ({ ...prev, [postId]: false }));
-        // Optionally refetch posts for accuracy
         getPosts(currentUserId).then(setPosts);
         return;
       }
       // Optimistically update UI
       setPosts((prevPosts) => prevPosts.map(post =>
-        post.id === postId ? { ...post, userReaction: null } : post
+        post.id === postId ? { 
+          ...post, 
+          userReaction: null,
+          likes: post.likes - (reactionType === "LIKE" ? 1 : 0),
+          dislikes: post.dislikes - (reactionType === "DISLIKE" ? 1 : 0)
+        } : post
       ));
       await deleteReactionApi(userReaction.id, currentUserId);
     } else {
+      // Add reaction
       setPosts((prevPosts) => prevPosts.map(post => {
         if (post.id !== postId) return post;
         let likes = post.likes || 0;
         let dislikes = post.dislikes || 0;
+        // Remove previous reaction if exists
+        if (post.userReaction) {
+          if (post.userReaction.type === "LIKE") likes--;
+          if (post.userReaction.type === "DISLIKE") dislikes--;
+        }
+        // Add new reaction
         if (reactionType === "LIKE") likes++;
         if (reactionType === "DISLIKE") dislikes++;
-        return { ...post, likes, dislikes, userReaction: { type: reactionType } };
+        return { 
+          ...post, 
+          likes, 
+          dislikes, 
+          userReaction: { type: reactionType } 
+        };
       }));
       await addReactionApi(postId, currentUserId, reactionType);
     }
@@ -84,7 +100,11 @@ export default function usePosts(currentUserId, initialPosts = []) {
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.id === postId
-          ? { ...post, comments: [...(post.comments || []), newComment], commentCount: (post.commentCount || 0) + 1 }
+          ? { 
+              ...post, 
+              comments: [...(post.comments || []), newComment], 
+              commentCount: (post.commentCount || 0) + 1 
+            }
           : post
       )
     );
@@ -92,6 +112,7 @@ export default function usePosts(currentUserId, initialPosts = []) {
 
   const handleEditComment = useCallback(async (postId, commentId, newText) => {
     await editCommentApi(commentId, currentUserId, { content: newText });
+    // Refetch posts to get updated data
     getPosts(currentUserId).then(setPosts);
   }, [currentUserId]);
 

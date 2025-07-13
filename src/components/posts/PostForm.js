@@ -4,15 +4,15 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { addPost } from "@/services/postService";
 
-export default function PostForm({ onSubmit }) {
+export default function PostForm({ onSubmit, userId }) {
   const [draft, setDraft] = useState("");
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!draft.trim()) return;
+    if (!draft.trim() || !userId) return;
     
     // Add post to backend
-    addPost(1, { content: draft }); // Use static userId 1 for now
+    addPost(userId, { content: draft });
     
     // Call parent component's onSubmit
     if (onSubmit) {
@@ -38,7 +38,7 @@ export default function PostForm({ onSubmit }) {
       <button
         type="submit"
         className="bg-[#fb5c1d] hover:bg-[#fa5c1a] text-white font-bold py-2 px-6 rounded-full transition-colors disabled:opacity-50"
-        disabled={!draft.trim()}
+        disabled={!draft.trim() || !userId}
       >
         Publish
       </button>
@@ -48,4 +48,5 @@ export default function PostForm({ onSubmit }) {
 
 PostForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
+  userId: PropTypes.number.isRequired,
 }; 

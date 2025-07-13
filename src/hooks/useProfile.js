@@ -29,6 +29,7 @@ export default function useProfile(userId) {
           if (isMounted.current) setProfile(data);
         })
         .catch((err) => {
+          console.error('Error fetching profile for user:', userId, err);
           if (isMounted.current) setError(err);
         })
         .finally(() => {

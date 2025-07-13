@@ -9,9 +9,7 @@ import { getProfileByUserId } from "@/services/profileService";
 import CommentForm from "./CommentForm";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 
-const currentUserId = 1; // Simulated logged-in user
-
-export default function CommentsModal({ open, onClose, post, onAddComment, onEditComment, onDeleteComment }) {
+export default function CommentsModal({ open, onClose, post, onAddComment, onEditComment, onDeleteComment, currentUserId }) {
   const [editingId, setEditingId] = useState(null);
   const [editingValue, setEditingValue] = useState("");
   const [deleteId, setDeleteId] = useState(null);
@@ -30,8 +28,8 @@ export default function CommentsModal({ open, onClose, post, onAddComment, onEdi
   if (!open) return null;
 
   async function handleAddComment(text) {
-    if (!post) return;
-    await addComment(post.id, 1, { content: text }); // Static userId 1 for now
+    if (!post || !currentUserId) return;
+    await addComment(post.id, currentUserId, { content: text });
     if (onAddComment) onAddComment(post.id, text);
   }
 
@@ -46,8 +44,8 @@ export default function CommentsModal({ open, onClose, post, onAddComment, onEdi
   }
 
   async function handleEditSave(commentId, newText) {
-    if (!post) return;
-    await editComment(commentId, 1, { content: newText });
+    if (!post || !currentUserId) return;
+    await editComment(commentId, currentUserId, { content: newText });
     if (onEditComment) onEditComment(post.id, commentId, newText);
     setEditingId(null);
     setEditingValue("");
@@ -58,8 +56,8 @@ export default function CommentsModal({ open, onClose, post, onAddComment, onEdi
   }
 
   async function confirmDeleteComment() {
-    if (!post || !deleteId) return;
-    await deleteComment(deleteId, 1);
+    if (!post || !deleteId || !currentUserId) return;
+    await deleteComment(deleteId, currentUserId);
     if (onDeleteComment) onDeleteComment(post.id, deleteId);
     setDeleteId(null);
   }
@@ -87,8 +85,8 @@ export default function CommentsModal({ open, onClose, post, onAddComment, onEdi
               <CommentItem
                 key={comment.id}
                 comment={{ ...comment, text: comment.content }}
-                isPostOwner={post?.authorId === 1}
-                currentUserId={1}
+                isPostOwner={post?.authorId === currentUserId}
+                currentUserId={currentUserId}
                 isEditing={editingId === comment.id}
                 editValue={editingValue}
                 onEditStart={() => handleEditStart(comment)}
@@ -105,6 +103,7 @@ export default function CommentsModal({ open, onClose, post, onAddComment, onEdi
           </div>
         </div>
       </div>
+      
       <ConfirmModal
         open={!!deleteId}
         onClose={cancelDeleteComment}
@@ -123,4 +122,5 @@ CommentsModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   post: PropTypes.object,
   onAddComment: PropTypes.func,
+  currentUserId: PropTypes.number.isRequired,
 }; 

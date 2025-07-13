@@ -1,16 +1,64 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { getProfileByUserId } from "@/services/profileService";
+import api from "@/services/api";
 
 export default function ProfileHeader() {
+  const { user } = useAuth();
   const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getProfileByUserId(1).then(setProfile);
-  }, []);
+    if (user?.id) {
+      fetchUserAndProfile();
+    }
+  }, [user]);
 
-  if (!profile) return <div>Loading...</div>;
+  const fetchUserAndProfile = async () => {
+    try {
+      // First, get the user info from backend to get the database user ID
+      const userResponse = await api.get('/users/me');
+      const userInfo = userResponse.data;
+      
+      if (userInfo?.id) {
+        // Then fetch the profile using the database user ID
+        const profileData = await getProfileByUserId(userInfo.id);
+        setProfile(profileData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user or profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl shadow p-6 border border-[#009ddb]/10">
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="bg-white rounded-2xl shadow p-6 border border-[#009ddb]/10">
+        <div className="text-center py-8">
+          <p className="text-gray-600">No profile information available.</p>
+          <button 
+            onClick={() => window.location.href = "/settings"}
+            className="mt-4 bg-[#009ddb] hover:bg-[#007bb5] text-white font-bold py-2 px-6 rounded-full transition-colors">
+            Create Profile
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow p-6 border border-[#009ddb]/10">

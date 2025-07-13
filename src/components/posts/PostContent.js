@@ -4,15 +4,15 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 
 export default function PostContent({ 
-  content, 
+  post,
   isEditing, 
-  onSave, 
-  onCancel 
+  onEditCancel, 
+  onEditSave 
 }) {
-  const [editContent, setEditContent] = useState(content);
+  const [editContent, setEditContent] = useState(post.content);
 
   function handleSave() {
-    onSave(editContent);
+    onEditSave(editContent);
   }
 
   if (isEditing) {
@@ -26,7 +26,7 @@ export default function PostContent({
         />
         <div className="flex justify-end gap-2 mt-2">
           <button 
-            onClick={onCancel}
+            onClick={onEditCancel}
             className="px-3 py-1 text-sm rounded bg-gray-100 hover:bg-gray-200"
           >
             Cancel
@@ -44,13 +44,13 @@ export default function PostContent({
   }
 
   return (
-    <p className="mb-3 text-gray-700 whitespace-pre-line">{content}</p>
+    <p className="mb-3 text-gray-700 whitespace-pre-line">{post.content}</p>
   );
 }
 
 PostContent.propTypes = {
-  content: PropTypes.string.isRequired,
+  post: PropTypes.object.isRequired,
   isEditing: PropTypes.bool.isRequired,
-  onSave: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
+  onEditSave: PropTypes.func.isRequired,
+  onEditCancel: PropTypes.func.isRequired,
 }; 

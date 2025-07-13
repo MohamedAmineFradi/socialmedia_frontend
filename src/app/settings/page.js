@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getProfileByUserId, updateProfile } from "@/services/profileService";
+import api from "@/services/api";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -19,22 +20,40 @@ export default function SettingsPage() {
   const [profileId, setProfileId] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getProfileByUserId(1).then((data) => {
-      setProfile({
-        name: data.name || "",
-        username: data.username || "",
-        bio: data.bio || "",
-        location: data.location || "",
-        website: data.website || "",
-        birthday: data.birthday || "",
-        avatar: data.avatar || "",
-        info: data.info || ""
-      });
-      setProfileId(data.id);
-    });
+    fetchUserAndProfile();
   }, []);
+
+  const fetchUserAndProfile = async () => {
+    try {
+      // First, get the user info from backend to get the database user ID
+      const userResponse = await api.get('/users/me');
+      const userInfo = userResponse.data;
+      
+      if (userInfo?.id) {
+        // Then fetch the profile using the database user ID
+        const profileData = await getProfileByUserId(userInfo.id);
+        setProfile({
+          name: profileData.name || "",
+          username: profileData.username || "",
+          bio: profileData.bio || "",
+          location: profileData.location || "",
+          website: profileData.website || "",
+          birthday: profileData.birthday || "",
+          avatar: profileData.avatar || "",
+          info: profileData.info || ""
+        });
+        setProfileId(profileData.id);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user or profile:', error);
+      setSaveMessage("Error loading profile. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,6 +76,20 @@ export default function SettingsPage() {
       setIsSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6 pb-10">
+        <h1 className="text-2xl font-bold text-[#009ddb]">Edit Profile</h1>
+        <div className="bg-white rounded-2xl shadow p-6 border border-[#009ddb]/10">
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading profile...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 pb-10">

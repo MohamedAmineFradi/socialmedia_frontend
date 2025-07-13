@@ -1,9 +1,18 @@
+"use client";
+
 import { useState } from "react";
 import Logo from "@/components/ui/Logo";
 import ProfileSidebar from "@/components/profile/ProfileSidebar";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 const Navigation = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const { isAuthenticated, user, login, logout, isSuperAdmin } = useAuth();
+
+    // Debug logging
+    console.log('Navigation - Current user:', user);
+    console.log('Navigation - User roles:', user?.roles);
+    console.log('Navigation - Is superAdmin:', isSuperAdmin());
 
     const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -34,6 +43,26 @@ const Navigation = () => {
         }
     ];
 
+    // Add admin link for superAdmin users
+    const adminItem = {
+        icon: "👑",
+        label: "Admin",
+        href: "/admin",
+        description: "Admin dashboard"
+    };
+
+    const allNavigationItems = isSuperAdmin() 
+        ? [...navigationItems, adminItem]
+        : navigationItems;
+
+    const handleAuthAction = () => {
+        if (isAuthenticated) {
+            logout();
+        } else {
+            login();
+        }
+    };
+
     return (
         <nav className="fixed bottom-0 z-40 flex w-full items-start justify-start bg-gradient-to-b from-[#009ddb] to-[#007bb5] py-2 text-white lg:static lg:flex-col lg:py-6 lg:h-screen lg:w-[280px] lg:shadow-xl lg:overflow-y-auto transition-all ease-in-out duration-300">
             {/* Logo Section */}
@@ -48,7 +77,7 @@ const Navigation = () => {
                     <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Navigation</h3>
                 </div>
                 <ul className="px-2 space-y-2">
-                    {navigationItems.map((item, index) => (
+                    {allNavigationItems.map((item, index) => (
                         <li key={index}>
                             <a
                                 href={item.href}
@@ -110,26 +139,42 @@ const Navigation = () => {
                 <div className="px-4 mb-6">
                     <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4">Profile</h3>
                     <div className="space-y-3">
-                        <ProfileSidebar />
-                        <a
-                            href="/me"
-                            className="flex items-center w-full px-4 py-3 text-left rounded-lg transition-all duration-200 group hover:bg-white/20"
-                        >
-                            <span className="text-2xl mr-4 group-hover:scale-110 transition-transform">👤</span>
-                            <div>
-                                <span className="block font-medium text-lg">Your Profile</span>
-                                <span className="block text-sm text-white/70">View and edit posts</span>
-                            </div>
-                        </a>
-                        <button
-                            className="flex items-center w-full px-4 py-3 text-left bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-all duration-200 group"
-                        >
-                            <span className="text-2xl mr-4 group-hover:scale-110 transition-transform">🔒</span>
-                            <div>
-                                <span className="block font-medium text-lg">Sign Out</span>
-                                <span className="block text-sm text-white/70">End your session</span>
-                            </div>
-                        </button>
+                        {isAuthenticated ? (
+                            <>
+                                <ProfileSidebar />
+                                <a
+                                    href="/me"
+                                    className="flex items-center w-full px-4 py-3 text-left rounded-lg transition-all duration-200 group hover:bg-white/20"
+                                >
+                                    <span className="text-2xl mr-4 group-hover:scale-110 transition-transform">👤</span>
+                                    <div>
+                                        <span className="block font-medium text-lg">Your Profile</span>
+                                        <span className="block text-sm text-white/70">View and edit posts</span>
+                                    </div>
+                                </a>
+                                <button
+                                    onClick={handleAuthAction}
+                                    className="flex items-center w-full px-4 py-3 text-left bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-all duration-200 group"
+                                >
+                                    <span className="text-2xl mr-4 group-hover:scale-110 transition-transform">🔒</span>
+                                    <div>
+                                        <span className="block font-medium text-lg">Sign Out</span>
+                                        <span className="block text-sm text-white/70">End your session</span>
+                                    </div>
+                                </button>
+                            </>
+                        ) : (
+                            <button
+                                onClick={handleAuthAction}
+                                className="flex items-center w-full px-4 py-3 text-left bg-green-500/20 hover:bg-green-500/30 rounded-lg transition-all duration-200 group"
+                            >
+                                <span className="text-2xl mr-4 group-hover:scale-110 transition-transform">🔑</span>
+                                <div>
+                                    <span className="block font-medium text-lg">Sign In</span>
+                                    <span className="block text-sm text-white/70">Start your session</span>
+                                </div>
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -137,7 +182,7 @@ const Navigation = () => {
                 <div className="px-4 mb-6">
                     <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4">Navigation</h3>
                     <ul className="space-y-3">
-                        {navigationItems.map((item, index) => (
+                        {allNavigationItems.map((item, index) => (
                             <li key={index}>
                                 <a
                                     href={item.href}

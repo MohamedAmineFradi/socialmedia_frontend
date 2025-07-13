@@ -1,6 +1,21 @@
+"use client";
+
 import Image from "next/image";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const { isAuthenticated, login } = useAuth();
+  const router = useRouter();
+
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      router.push('/posts');
+    } else {
+      login();
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col justify-between bg-[#1da1f2] p-0">
       <div className="flex flex-1 flex-col md:flex-row items-center justify-center gap-0 md:gap-12 w-full max-w-5xl mx-auto py-12">
@@ -21,12 +36,12 @@ export default function Home() {
             Chat and Share without chains.<br />
             <span className="text-[#1976d2] font-semibold">Liberty</span>, <span className="text-[#1976d2] font-semibold">Peace</span>, and <span className="text-[#1976d2] font-semibold">Respect</span> for all.
           </p>
-          <a
-            href="#"
+          <button
+            onClick={handleGetStarted}
             className="mt-6 bg-[#ff9800] hover:bg-[#fbc02d] text-white font-bold py-3 px-8 rounded-full shadow transition-colors text-lg"
           >
-            Join Now
-          </a>
+            {isAuthenticated ? 'Go to Feed' : 'Join Now'}
+          </button>
         </div>
       </div>
       <footer className="w-full py-6 text-white/80 text-sm text-center bg-transparent">

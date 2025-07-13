@@ -7,6 +7,7 @@ export default function CommentItem({
   comment, 
   isPostOwner, 
   currentUserId, 
+  isSuperAdmin,
   isEditing,
   editValue,
   onEditStart,
@@ -15,6 +16,8 @@ export default function CommentItem({
   onEditChange,
   onDelete 
 }) {
+  const [avatarError, setAvatarError] = useState(false);
+
   // Remove local isEditing/editContent state
 
   function handleEditSave() {
@@ -25,7 +28,17 @@ export default function CommentItem({
     onDelete(comment.id);
   }
 
-  const avatarUrl = comment.avatar || "https://ui-avatars.com/api/?name=" + encodeURIComponent(comment.author);
+  const handleAvatarError = () => {
+    setAvatarError(true);
+  };
+
+  // Fallback avatar URL using UI Avatars service
+  const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author)}&background=009ddb&color=fff&size=32`;
+  const avatarUrl = (comment.avatar && !avatarError) ? comment.avatar : fallbackAvatar;
+
+  // Check if user can edit/delete this comment
+  const isOwnComment = comment.authorId === currentUserId;
+  const canEditComment = isOwnComment || isSuperAdmin;
 
   return (
     <div className="flex items-start gap-3">
@@ -34,6 +47,7 @@ export default function CommentItem({
         alt={comment.author}
         className="w-8 h-8 rounded-full object-cover bg-white/20 border border-white/30"
         loading="lazy"
+        onError={handleAvatarError}
       />
       <div className="flex-1">
         <div className="flex items-center justify-between">
@@ -42,19 +56,19 @@ export default function CommentItem({
               {comment.author}
             </span>
             {comment.username && (
-              <span className="ml-2 text-xs text-white/60">{comment.username}</span>
+              <span className="ml-2 text-xs text-white/60">@{comment.username}</span>
             )}
             <span className="ml-2 text-white/70 text-xs">
               {comment.minutesAgo} min ago
             </span>
           </div>
-          {(comment.authorId === currentUserId || isPostOwner) && !isEditing && (
+          {(comment.authorId === currentUserId || isPostOwner || isSuperAdmin) && !isEditing && (
             <div className="flex gap-2">
-              {comment.authorId === currentUserId && (
+              {canEditComment && (
                 <button 
                   onClick={onEditStart} 
                   className="text-sm px-1.5 py-0.5 rounded bg-white/20 hover:bg-white/30 text-white" 
-                  title="Edit"
+                  title={isOwnComment ? "Edit" : "Edit (Admin)"}
                 >
                   ✒️
                 </button>
@@ -62,7 +76,7 @@ export default function CommentItem({
               <button 
                 onClick={handleDelete} 
                 className="text-sm px-1.5 py-0.5 rounded bg-red-400/20 hover:bg-red-400/40 text-white" 
-                title="Delete"
+                title={isOwnComment || isPostOwner ? "Delete" : "Delete (Admin)"}
               >
                 ❌
               </button>
@@ -110,9 +124,11 @@ CommentItem.propTypes = {
     authorId: PropTypes.number.isRequired,
     text: PropTypes.string.isRequired,
     minutesAgo: PropTypes.number.isRequired,
+    username: PropTypes.string,
   }).isRequired,
   isPostOwner: PropTypes.bool.isRequired,
   currentUserId: PropTypes.number.isRequired,
+  isSuperAdmin: PropTypes.bool,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 }; 

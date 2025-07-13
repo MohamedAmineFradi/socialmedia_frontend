@@ -6,9 +6,8 @@ import ConfirmModal from "@/components/ui/ConfirmModal";
 import { getComments } from "@/services/commentService";
 import { getProfileByUserId } from "@/services/profileService";
 import { enrichCommentsWithProfiles, mapCommentResponseToUI } from "@/utils/profile";
-import { currentUserId } from "@/mocks/currentUser";
 
-export default function InlineComments({ post, onAddComment, onEditComment, onDeleteComment }) {
+export default function InlineComments({ post, onAddComment, onEditComment, onDeleteComment, currentUserId, isSuperAdmin }) {
   const [comments, setComments] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editingValue, setEditingValue] = useState("");
@@ -80,6 +79,7 @@ export default function InlineComments({ post, onAddComment, onEditComment, onDe
             comment={mapCommentResponseToUI(comment)}
             isPostOwner={post?.authorId === currentUserId}
             currentUserId={currentUserId}
+            isSuperAdmin={isSuperAdmin}
             isEditing={editingId === comment.id}
             editValue={editingValue}
             onEditStart={() => handleEditStart(comment)}

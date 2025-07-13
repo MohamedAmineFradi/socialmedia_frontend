@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Feed from "../../components/posts/Feed";
 import { getPosts } from "@/services/postService";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function PostsPage() {
   const [posts, setPosts] = useState([]);
@@ -19,5 +20,9 @@ export default function PostsPage() {
     return <div className="p-6 text-center">Loading posts...</div>;
   }
 
-  return <Feed initialPosts={posts} />;
+  return (
+    <ProtectedRoute>
+      <Feed initialPosts={posts} />
+    </ProtectedRoute>
+  );
 } 

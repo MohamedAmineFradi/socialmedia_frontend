@@ -6,17 +6,47 @@ import PostCard from "./PostCard";
 import InlineComments from "./comments/InlineComments";
 import { getUserPosts, editPost as editPostApi, deletePost as deletePostApi, addReaction as addReactionApi } from "@/services/postService";
 import { addComment as addCommentApi, editComment as editCommentApi, deleteComment as deleteCommentApi } from "@/services/commentService";
-
-const currentUserId = 1; // Simulated logged-in user
+import { useAuth } from "@/components/auth/AuthProvider";
+import api from "@/services/api";
 
 export default function UserPostsList() {
+  const { user } = useAuth();
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
   const [pickerPostId, setPickerPostId] = useState(null);
   const [openComments, setOpenComments] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [hasFetchedUserInfo, setHasFetchedUserInfo] = useState(false);
+
+  // Get the database user ID from backend
+  useEffect(() => {
+    if (user?.id && !hasFetchedUserInfo) {
+      fetchUserInfo();
+    }
+  }, [user, hasFetchedUserInfo]);
+
+  const fetchUserInfo = async () => {
+    try {
+      if (user?.id) {
+        const response = await api.get('/users/me');
+        setCurrentUserId(response.data?.id);
+        setHasFetchedUserInfo(true);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user info:', error);
+      // Fallback to first user in dev mode
+      setCurrentUserId(1);
+      setHasFetchedUserInfo(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    getUserPosts(currentUserId).then(setUserPosts);
-  }, []);
+    if (currentUserId) {
+      getUserPosts(currentUserId).then(setUserPosts);
+    }
+  }, [currentUserId]);
 
   function handleCommentsClick(postId) {
     setOpenComments((prev) => ({ ...prev, [postId]: !prev[postId] }));
@@ -73,6 +103,15 @@ export default function UserPostsList() {
     getUserPosts(currentUserId).then(setUserPosts);
   }
 
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl shadow p-6 text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading your posts...</p>
+      </div>
+    );
+  }
+
   if (userPosts.length === 0) {
     return (
       <div className="bg-white rounded-2xl shadow p-6 text-center">
@@ -110,6 +149,7 @@ export default function UserPostsList() {
               onEdit={handleEditPost}
               onDelete={handleDeletePost}
               userReaction={post.userReaction}
+              currentUserId={currentUserId}
             />
             {openComments[post.id] && (
               <InlineComments
@@ -117,6 +157,7 @@ export default function UserPostsList() {
                 onAddComment={handleAddComment}
                 onEditComment={handleEditComment}
                 onDeleteComment={handleDeleteComment}
+                currentUserId={currentUserId}
               />
             )}
           </motion.div>

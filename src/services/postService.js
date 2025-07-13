@@ -36,17 +36,17 @@ export const getUserPosts = async (userId) => {
 };
 
 export const addPost = async (userId, postData) => {
-  const { data } = await api.post(`/posts/user/${userId}`, postData);
+  const { data } = await api.post('/posts', postData);
   return data;
 };
 
 export const editPost = async (postId, userId, postData) => {
-  const { data } = await api.put(`/posts/${postId}/user/${userId}`, postData);
+  const { data } = await api.put(`/posts/${postId}`, postData);
   return data;
 };
 
 export const deletePost = async (postId, userId) => {
-  const { data } = await api.delete(`/posts/${postId}/user/${userId}`);
+  const { data } = await api.delete(`/posts/${postId}`);
   return data;
 };
 

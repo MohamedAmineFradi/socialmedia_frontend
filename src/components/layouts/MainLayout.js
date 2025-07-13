@@ -7,6 +7,7 @@ import ChatDrawer from "../chat/ChatDrawer";
 import WhoToFollow from "../sidebar/WhoToFollow";
 import Navigation from "@/components/nav/Navigation";
 import Footer from "@/components/ui/Footer";
+import BackendStatus from "@/components/ui/BackendStatus";
 
 export default function MainLayout({ children }) {
   const pathname = usePathname();
@@ -15,11 +16,17 @@ export default function MainLayout({ children }) {
 
   // If we're on the home page, just render children (home page)
   if (isHome) {
-    return <>{children}</>;
+    return (
+      <>
+        <BackendStatus />
+        {children}
+      </>
+    );
   }
 
   return (
       <>
+    <BackendStatus />
     <div className="bg-gray-100 text-sm lg:grid lg:grid-cols-[280px_1fr_300px] lg:gap-6 lg:h-screen lg:overflow-hidden">
       <Navigation/>
 
