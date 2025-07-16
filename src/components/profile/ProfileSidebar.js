@@ -3,62 +3,33 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { getProfileByUserId } from "@/services/profileService";
+import useUserDbId from "@/hooks/useUserDbId";
+import useProfile from "@/hooks/useProfile";
 import api from "@/services/api";
 
 export default function ProfileSidebar() {
   const router = useRouter();
   const { user, logout, refreshUserRoles, isSuperAdmin } = useAuth();
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [hasRefreshedRoles, setHasRefreshedRoles] = useState(false);
+
+  const { userDbId, loadingUserId } = useUserDbId();
+  const { profile, loading } = useProfile(userDbId && !loadingUserId ? userDbId : null);
+
+  useEffect(() => {
+    if (profile) {
+      console.log("ProfileSidebar: profile updated", profile);
+    }
+  }, [profile]);
 
   // Debug logging
   console.log('ProfileSidebar - Current user:', user);
   console.log('ProfileSidebar - User roles:', user?.roles);
   console.log('ProfileSidebar - Is superAdmin:', isSuperAdmin());
+  console.log('ProfileSidebar - userDbId utilisé:', userDbId);
 
-  useEffect(() => {
-    if (user?.id && !hasRefreshedRoles) {
-      fetchUserAndProfile();
-    }
-  }, [user, hasRefreshedRoles]);
-
-  const fetchUserAndProfile = async () => {
-    try {
-      setLoading(true);
-      
-      // First, refresh user roles from backend (only once)
-      if (!hasRefreshedRoles) {
-        await refreshUserRoles();
-        setHasRefreshedRoles(true);
-      }
-      
-      // Then, get the user info from backend to get the database user ID
-      try {
-        const userResponse = await api.get('/users/me');
-        const userInfo = userResponse.data;
-        
-        if (userInfo?.id) {
-          // Then fetch the profile using the database user ID
-          const profileData = await getProfileByUserId(userInfo.id);
-          setProfile(profileData);
-        }
-      } catch (error) {
-        if (error.response?.status === 404) {
-          console.log('User not found in database yet, this is normal during first login');
-        } else {
-          console.error('Failed to fetch user info:', error);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch user or profile:', error);
-      // Don't keep retrying on error to prevent infinite loops
-      setHasRefreshedRoles(true);
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (loadingUserId || !userDbId) {
+    return <div>Chargement du profil utilisateur...</div>;
+  }
 
   const handleViewProfile = () => {
     router.push("/me");
@@ -116,12 +87,10 @@ export default function ProfileSidebar() {
       )}
       <h2 className="text-lg font-bold text-white">{profile?.name || `${user?.firstName} ${user?.lastName}` || "Unknown User"}</h2>
       <p className="text-sm text-gray-200 mb-4">{profile?.bio || "No bio provided."}</p>
-      
       {/* Role indicator for debugging */}
       <div className="text-xs text-yellow-300 mb-4">
         Role: {user?.roles?.includes('superAdmin') ? '👑 SuperAdmin' : '👤 User'}
       </div>
-
       <div className="flex gap-6 text-center mb-4">
         <div>
           <div className="text-[#fb5c1d] font-bold">34</div>
@@ -132,7 +101,6 @@ export default function ProfileSidebar() {
           <div className="text-xs text-gray-200">Followers</div>
         </div>
       </div>
-
       <aside className="flex gap-4">
         <button 
           onClick={handleViewProfile}

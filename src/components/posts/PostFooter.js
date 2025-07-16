@@ -1,90 +1,79 @@
 "use client";
 
 import PropTypes from "prop-types";
-import { useState, useEffect } from "react";
-
-const ANIMATION_DURATION = 500; // 500ms
 
 export default function PostFooter({
-  likes,
-  dislikes,
-  commentCount,
+  post,
   onLike,
   onDislike,
-  onCommentsClick,
-  isCommentsOpen,
-  userReaction,
+  onEdit,
+  onDelete,
   pendingReaction,
+  showPicker,
+  onLongPress,
+  onClosePicker,
+  currentUserId,
+  onCommentsClick, // new prop
 }) {
-  const [likeActive, setLikeActive] = useState(false);
-  const [dislikeActive, setDislikeActive] = useState(false);
-
-  useEffect(() => {
-    if (likeActive) {
-      const timeout = setTimeout(() => setLikeActive(false), ANIMATION_DURATION);
-      return () => clearTimeout(timeout);
-    }
-    if (dislikeActive) {
-      const timeout = setTimeout(() => setDislikeActive(false), ANIMATION_DURATION);
-      return () => clearTimeout(timeout);
-    }
-  }, [likeActive, dislikeActive]);
-
-  function handleLike() {
-    setLikeActive(true);
-    onLike();
-  }
-
-  function handleDislike() {
-    setDislikeActive(true);
-    onDislike();
-  }
-
   return (
-    <footer className="flex items-center justify-between mt-4">
-      <div className="flex gap-4">
+    <div className="flex items-center justify-between mt-4">
+      <div className="flex items-center gap-4">
         <button
-          onClick={handleLike}
+          className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${post.userReaction?.type === "LIKE" ? "bg-[#009ddb]/20 text-[#009ddb]" : "bg-gray-100 text-gray-600"}`}
+          onClick={onLike}
           disabled={pendingReaction}
-          className={`text-[#009ddb] font-bold transition-transform duration-[${ANIMATION_DURATION}] px-2 py-1 rounded-full
-            ${likeActive ? 'scale-110 bg-[#fde848]' : ''}
-            ${userReaction === 'LIKE' ? 'bg-[#fde848] text-[#009ddb]' : 'bg-gray-100'}
-            ${pendingReaction ? 'opacity-50 cursor-not-allowed' : ''}
-          `}
         >
-          👍 {typeof likes === 'number' ? likes : 0}
+          👍 {post.likes || 0}
+          {pendingReaction && <span className="ml-1 animate-spin">⏳</span>}
         </button>
         <button
-          onClick={handleDislike}
+          className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${post.userReaction?.type === "DISLIKE" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600"}`}
+          onClick={onDislike}
           disabled={pendingReaction}
-          className={`text-[#009ddb] font-bold transition-transform duration-[${ANIMATION_DURATION}] px-2 py-1 rounded-full
-            ${dislikeActive ? 'scale-110 bg-[#fde848]' : ''}
-            ${userReaction === 'DISLIKE' ? 'bg-[#fde848] text-[#009ddb]' : 'bg-gray-100'}
-            ${pendingReaction ? 'opacity-50 cursor-not-allowed' : ''}
-          `}
         >
-          👎 {typeof dislikes === 'number' ? dislikes : 0}
+          👎 {post.dislikes || 0}
+          {pendingReaction && <span className="ml-1 animate-spin">⏳</span>}
         </button>
         <button
+          className="text-gray-400 text-sm hover:underline focus:outline-none"
           onClick={onCommentsClick}
-          className={`font-bold flex items-center gap-1 px-3 py-1 rounded-full transition-colors ${isCommentsOpen ? 'bg-[#fde848] text-[#009ddb]' : 'bg-gray-100 text-[#009ddb] hover:bg-[#009ddb] hover:text-white'}`}
+          aria-label="Show comments"
         >
-          💬 {typeof commentCount === 'number' ? commentCount : 0}
-          <span className="ml-1">{isCommentsOpen ? 'Hide' : 'Comments'}</span>
+          💬 {post.commentCount || 0}
         </button>
       </div>
-    </footer>
+      <div className="flex items-center gap-2">
+        {onEdit && (
+          <button
+            className="text-blue-500 hover:underline text-sm"
+            onClick={onEdit}
+          >
+            Edit
+          </button>
+        )}
+        {onDelete && (
+          <button
+            className="text-red-500 hover:underline text-sm"
+            onClick={onDelete}
+          >
+            Delete
+          </button>
+        )}
+      </div>
+    </div>
   );
 }
 
 PostFooter.propTypes = {
-  likes: PropTypes.number.isRequired,
-  dislikes: PropTypes.number.isRequired,
-  commentCount: PropTypes.number.isRequired,
+  post: PropTypes.object.isRequired,
   onLike: PropTypes.func.isRequired,
   onDislike: PropTypes.func.isRequired,
-  onCommentsClick: PropTypes.func.isRequired,
-  isCommentsOpen: PropTypes.bool.isRequired,
-  userReaction: PropTypes.string,
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
   pendingReaction: PropTypes.bool,
+  showPicker: PropTypes.bool,
+  onLongPress: PropTypes.func,
+  onClosePicker: PropTypes.func,
+  currentUserId: PropTypes.any,
+  onCommentsClick: PropTypes.func, // new prop
 }; 

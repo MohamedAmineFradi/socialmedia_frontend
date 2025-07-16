@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import AdminProtectedRoute from "@/components/auth/AdminProtectedRoute";
 import api from "@/services/api";
 
 export default function AdminPage() {
@@ -125,13 +125,8 @@ export default function AdminPage() {
   );
 
   return (
-    <ProtectedRoute>
-      {isSuperAdmin() ? <AdminContent /> : (
-        <div className="text-center py-12">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600">You don't have permission to access this page.</p>
-        </div>
-      )}
-    </ProtectedRoute>
+    <AdminProtectedRoute>
+      <AdminContent />
+    </AdminProtectedRoute>
   );
 } 

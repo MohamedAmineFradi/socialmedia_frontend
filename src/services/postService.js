@@ -3,7 +3,7 @@ import api from './api';
 // Fetch the current user's reaction for a post
 export const getUserReactionForPost = async (postId, userId) => {
   if (!userId) {
-    console.warn("getUserReactionForPost called with undefined userId", { postId, userId });
+    // Don't even warn, just skip
     return null;
   }
   try {
@@ -15,8 +15,14 @@ export const getUserReactionForPost = async (postId, userId) => {
   }
 };
 
+const EMPTY_ARRAY = [];
+
 export const getPosts = async (currentUserId) => {
   const { data: posts } = await api.get('/posts');
+  if (!currentUserId) {
+    // No userId, skip userReaction
+    return posts.map(post => ({ ...post, userReaction: null }));
+  }
   // Attach userReaction (type + id) to each post
   const postsWithUserReaction = await Promise.all(
     posts.map(async (post) => {

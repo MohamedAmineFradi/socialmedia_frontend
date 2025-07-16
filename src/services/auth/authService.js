@@ -1,17 +1,16 @@
 import keycloak from './keycloak';
-import { useAuthStore } from '@/store/authStore';
+import { store } from '@/store/store';
+import { login as loginAction, logout as logoutAction, setUser, setToken } from '@/store/authSlice';
 import api from '@/services/api';
 
 class AuthService {
   constructor() {
     this.keycloak = keycloak;
-    this.authStore = useAuthStore;
     this.initialized = false;
   }
 
   async init() {
     try {
-      // Check if already initialized
       if (this.initialized) {
         return this.keycloak.authenticated;
       }
@@ -24,7 +23,7 @@ class AuthService {
         silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
         checkLoginIframe: false,
         enableLogging: true,
-        pkceMethod: 'S256' // Enable PKCE for better security
+        pkceMethod: 'S256'
       });
 
       console.log('Keycloak initialized, authenticated:', authenticated);
@@ -43,7 +42,6 @@ class AuthService {
         keycloak: this.keycloak
       });
       
-      // Provide more specific error messages
       let errorMessage = 'Keycloak initialization failed';
       if (error.message.includes('NetworkError')) {
         errorMessage = 'Cannot connect to Keycloak server. Please check if Keycloak is running on http://localhost:8081';
@@ -75,10 +73,10 @@ class AuthService {
       await this.keycloak.logout({
         redirectUri: window.location.origin
       });
-      this.authStore.getState().logout();
+      store.dispatch(logoutAction());
     } catch (error) {
       console.error('Logout failed:', error);
-      this.authStore.getState().logout();
+      store.dispatch(logoutAction());
       throw new Error(`Logout failed: ${error.message}`);
     }
   }
@@ -86,8 +84,12 @@ class AuthService {
   async handleSuccessfulAuth() {
     console.log('Handling successful authentication...');
     const token = this.keycloak.token;
+
+    // Put the token in Redux immediately so API calls have the Authorization header
+    if (token) {
+      store.dispatch(setToken(token));
+    }
     
-    // Get user info from backend to get the correct roles
     let backendUserInfo = null;
     let retryCount = 0;
     const maxRetries = 3;
@@ -95,21 +97,22 @@ class AuthService {
     while (retryCount < maxRetries) {
       try {
         console.log(`Attempting to get backend user info (attempt ${retryCount + 1}/${maxRetries})...`);
-        const response = await api.get('/users/me');
+        const response = await api.get('/users/me', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         backendUserInfo = response.data;
         console.log('Backend user info:', backendUserInfo);
-        break; // Success, exit retry loop
+        break;
       } catch (error) {
         retryCount++;
         console.error(`Failed to get backend user info (attempt ${retryCount}/${maxRetries}):`, error);
-        
         if (error.response?.status === 404 && retryCount < maxRetries) {
-          // User might not exist yet, wait a bit and retry
           console.log('User not found in database, waiting before retry...');
-          await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Exponential backoff
+          await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
           continue;
         } else {
-          // Either max retries reached or different error
           console.error('Failed to get backend user info after retries');
           break;
         }
@@ -117,25 +120,24 @@ class AuthService {
     }
     
     const user = {
-      id: this.keycloak.subject,
+      id: backendUserInfo?.id || this.keycloak.subject, // DB user ID if available, else Keycloak UUID
+      keycloakId: this.keycloak.subject, // Always store Keycloak UUID separately
       username: this.keycloak.tokenParsed?.preferred_username,
       email: this.keycloak.tokenParsed?.email,
       firstName: this.keycloak.tokenParsed?.given_name,
       lastName: this.keycloak.tokenParsed?.family_name,
-      // Use roles from backend if available, otherwise assign based on username
       roles: backendUserInfo?.roles || this.getDefaultRoles(this.keycloak.tokenParsed?.preferred_username)
     };
 
     console.log('User data with roles:', user);
-    this.authStore.getState().login(token, user);
+    store.dispatch(loginAction({ token, user }));
 
-    // Set up token refresh
     this.keycloak.onTokenExpired = () => {
       console.log('Token expired, refreshing...');
       this.keycloak.updateToken(70).then((refreshed) => {
         if (refreshed) {
           console.log('Token refreshed successfully');
-          this.authStore.getState().setToken(this.keycloak.token);
+          store.dispatch(setToken(this.keycloak.token));
         }
       }).catch((error) => {
         console.error('Token refresh failed:', error);
@@ -157,17 +159,14 @@ class AuthService {
     try {
       const response = await api.get('/users/me');
       const backendUserInfo = response.data;
-      
-      // Update the user roles in the auth store
-      const currentUser = this.getUser();
+      const currentUser = store.getState().auth.user;
       if (currentUser && backendUserInfo?.roles) {
         const updatedUser = {
           ...currentUser,
           roles: backendUserInfo.roles
         };
-        this.authStore.getState().updateUser(updatedUser);
+        store.dispatch(setUser(updatedUser));
       }
-      
       return backendUserInfo;
     } catch (error) {
       if (error.response?.status === 404) {
@@ -181,15 +180,15 @@ class AuthService {
   }
 
   isAuthenticated() {
-    return this.authStore.getState().isAuthenticated;
+    return store.getState().auth.isAuthenticated;
   }
 
   getToken() {
-    return this.authStore.getState().token;
+    return store.getState().auth.token;
   }
 
   getUser() {
-    return this.authStore.getState().user;
+    return store.getState().auth.user;
   }
 
   hasRole(role) {
@@ -211,7 +210,7 @@ class AuthService {
             ...currentUser,
             roles: backendUserInfo.roles
           };
-          this.authStore.getState().updateUser(updatedUser);
+          store.dispatch(setUser(updatedUser));
           console.log('User roles refreshed:', backendUserInfo.roles);
         }
       } else {
@@ -223,4 +222,16 @@ class AuthService {
   }
 }
 
-export default new AuthService(); 
+const authService = new AuthService();
+export default authService; 
+
+// Add this function to extract roles from the Keycloak token
+export function extractRolesFromToken(token) {
+  if (!token) return [];
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.realm_access?.roles || [];
+  } catch (e) {
+    return [];
+  }
+}

@@ -1,36 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import CommentItem from "./CommentItem";
 import CommentModal from "./CommentModal";
-import { addComment, editComment, deleteComment } from "@/services/commentService";
-import { getProfileByUserId } from "@/services/profileService";
 import CommentForm from "./CommentForm";
 import ConfirmModal from "@/components/ui/ConfirmModal";
+import useComments from "@/hooks/useComments";
 
-export default function CommentsModal({ open, onClose, post, onAddComment, onEditComment, onDeleteComment, currentUserId }) {
+export default function CommentsModal({ open, onClose, post, currentUserId }) {
   const [editingId, setEditingId] = useState(null);
   const [editingValue, setEditingValue] = useState("");
   const [deleteId, setDeleteId] = useState(null);
 
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
+  // Utilise le hook Redux pour les commentaires
+  const { comments, loading, handleAddComment, handleEditComment, handleDeleteComment } = useComments(post?.id, currentUserId);
 
   if (!open) return null;
 
-  async function handleAddComment(text) {
-    if (!post || !currentUserId) return;
-    await addComment(post.id, currentUserId, { content: text });
-    if (onAddComment) onAddComment(post.id, text);
+  async function handleAdd(text) {
+    await handleAddComment(text);
   }
 
   function handleEditStart(comment) {
@@ -44,76 +33,54 @@ export default function CommentsModal({ open, onClose, post, onAddComment, onEdi
   }
 
   async function handleEditSave(commentId, newText) {
-    if (!post || !currentUserId) return;
-    await editComment(commentId, currentUserId, { content: newText });
-    if (onEditComment) onEditComment(post.id, commentId, newText);
+    await handleEditComment(commentId, newText);
     setEditingId(null);
     setEditingValue("");
   }
 
-  function handleDeleteComment(commentId) {
+  function handleDelete(commentId) {
     setDeleteId(commentId);
   }
 
-  async function confirmDeleteComment() {
-    if (!post || !deleteId || !currentUserId) return;
-    await deleteComment(deleteId, currentUserId);
-    if (onDeleteComment) onDeleteComment(post.id, deleteId);
-    setDeleteId(null);
-  }
-
-  function cancelDeleteComment() {
-    setDeleteId(null);
+  async function confirmDelete() {
+    if (deleteId) {
+      await handleDeleteComment(deleteId, post.id);
+      setDeleteId(null);
+    }
   }
 
   return (
-    <>
-      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
-        <div className="bg-[#009ddb] text-white rounded-2xl shadow-lg w-full max-w-2xl mx-4 animate-fadeIn">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[#0089c3]">
-            <span className="font-bold text-lg">Comments</span>
-            <button
-              onClick={onClose}
-              className="text-white hover:text-[#fde848] text-2xl font-bold focus:outline-none"
-              aria-label="Close"
-            >
-              &times;
-            </button>
-          </div>
-          <div className="px-6 py-4 max-h-[60vh] overflow-y-auto flex flex-col gap-4 scrollbar-hide">
-            {(post.comments || []).map((comment) => (
-              <CommentItem
-                key={comment.id}
-                comment={{ ...comment, text: comment.content }}
-                isPostOwner={post?.authorId === currentUserId}
-                currentUserId={currentUserId}
-                isEditing={editingId === comment.id}
-                editValue={editingValue}
-                onEditStart={() => handleEditStart(comment)}
-                onEditCancel={handleEditCancel}
-                onEditSave={handleEditSave}
-                onEditChange={setEditingValue}
-                onDelete={handleDeleteComment}
-              />
-            ))}
-            {/* Add Comment Form below comments */}
-            <div className="mt-4">
-              <CommentForm onSubmit={handleAddComment} />
-            </div>
-          </div>
-        </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+      <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
+        <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600" onClick={onClose}>&times;</button>
+        <h2 className="text-xl font-bold mb-4">Commentaires</h2>
+        {loading ? (
+          <div className="text-center text-gray-500">Chargement des commentaires...</div>
+        ) : (
+          comments.map((comment) => (
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              onEdit={() => handleEditStart(comment)}
+              onDelete={() => handleDelete(comment.id)}
+              isEditing={editingId === comment.id}
+              editingValue={editingValue}
+              onEditCancel={handleEditCancel}
+              onEditSave={handleEditSave}
+              currentUserId={currentUserId}
+            />
+          ))
+        )}
+        <CommentForm onSubmit={handleAdd} />
+        <ConfirmModal
+          open={!!deleteId}
+          onClose={() => setDeleteId(null)}
+          onConfirm={confirmDelete}
+          title="Supprimer le commentaire ?"
+          description="Cette action est irréversible."
+        />
       </div>
-      
-      <ConfirmModal
-        open={!!deleteId}
-        onClose={cancelDeleteComment}
-        onConfirm={confirmDeleteComment}
-        title="Delete Comment"
-        description="Are you sure you want to delete this comment? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
-      />
-    </>
+    </div>
   );
 }
 
@@ -121,6 +88,5 @@ CommentsModal.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   post: PropTypes.object,
-  onAddComment: PropTypes.func,
   currentUserId: PropTypes.number.isRequired,
 }; 

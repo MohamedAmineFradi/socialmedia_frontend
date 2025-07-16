@@ -1,34 +1,24 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import CommentItem from "./CommentItem";
 import CommentForm from "./CommentForm";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { getComments } from "@/services/commentService";
-import { getProfileByUserId } from "@/services/profileService";
-import { enrichCommentsWithProfiles, mapCommentResponseToUI } from "@/utils/profile";
+import useComments from "@/hooks/useComments";
 
-export default function InlineComments({ post, onAddComment, onEditComment, onDeleteComment, currentUserId, isSuperAdmin }) {
-  const [comments, setComments] = useState([]);
+export default function InlineComments({ post, currentUserId, isSuperAdmin, refreshKey }) {
   const [editingId, setEditingId] = useState(null);
   const [editingValue, setEditingValue] = useState("");
   const [deleteId, setDeleteId] = useState(null);
 
-  useEffect(() => {
-    if (post?.id) {
-      getComments(post.id).then(async (comments) => {
-        const commentsWithProfiles = await enrichCommentsWithProfiles(comments);
-        setComments(commentsWithProfiles);
-      });
-    }
-  }, [post?.id]);
+  // Utilise le hook Redux pour les commentaires
+  // Add refreshKey as a dependency to force refetch
+  const { comments, loading, handleAddComment, handleEditComment, handleDeleteComment } = useComments(post?.id, currentUserId, refreshKey);
 
-  async function handleAddComment(text) {
-    if (!post) return;
-    await onAddComment(post.id, text);
-    getComments(post.id).then(async (comments) => {
-      const commentsWithProfiles = await enrichCommentsWithProfiles(comments);
-      setComments(commentsWithProfiles);
-    });
+  async function handleAdd(text) {
+    await handleAddComment(text);
+    if (typeof window !== 'undefined' && window.dispatchEvent) {
+      window.dispatchEvent(new CustomEvent('commentsUpdated', { detail: { postId: post.id } }));
+    }
   }
 
   function handleEditStart(comment) {
@@ -42,65 +32,64 @@ export default function InlineComments({ post, onAddComment, onEditComment, onDe
   }
 
   async function handleEditSave(commentId, newText) {
-    if (!post) return;
-    await onEditComment(post.id, commentId, newText);
-    setEditingId(null);
-    setEditingValue("");
-    getComments(post.id).then(async (comments) => {
-      const commentsWithProfiles = await enrichCommentsWithProfiles(comments);
-      setComments(commentsWithProfiles);
-    });
+    try {
+      await handleEditComment(commentId, newText);
+      setEditingId(null);
+      setEditingValue("");
+      // Optimistically update UI: Redux state is updated by the fulfilled reducer
+      // No need to refetch unless error
+      // console.log('Comment edited successfully, UI updated via Redux');
+    } catch (err) {
+      console.error('Failed to edit comment, refetching...', err);
+      if (typeof window !== 'undefined' && window.dispatchEvent) {
+        window.dispatchEvent(new CustomEvent('commentsUpdated', { detail: { postId: post.id } }));
+      }
+    }
   }
 
-  function handleDeleteComment(commentId) {
+  function handleDelete(commentId) {
     setDeleteId(commentId);
   }
 
-  async function confirmDeleteComment() {
-    if (!post || !deleteId) return;
-    await onDeleteComment(post.id, deleteId);
-    setDeleteId(null);
-    getComments(post.id).then(async (comments) => {
-      const commentsWithProfiles = await enrichCommentsWithProfiles(comments);
-      setComments(commentsWithProfiles);
-    });
+  async function confirmDelete() {
+    if (deleteId) {
+      await handleDeleteComment(deleteId, post.id);
+      setDeleteId(null);
+      if (typeof window !== 'undefined' && window.dispatchEvent) {
+        window.dispatchEvent(new CustomEvent('commentsUpdated', { detail: { postId: post.id } }));
+      }
+    }
   }
 
-  function cancelDeleteComment() {
-    setDeleteId(null);
+  if (loading) {
+    return <div className="p-4 text-center text-gray-500">Chargement des commentaires...</div>;
   }
 
   return (
-    <div className="bg-[#009ddb] text-white rounded-2xl shadow-lg w-full mt-4 p-4">
-      <div className="flex flex-col gap-4 max-h-[40vh] overflow-y-auto scrollbar-hide">
-        {(comments || []).map((comment) => (
-          <CommentItem
-            key={comment.id}
-            comment={mapCommentResponseToUI(comment)}
-            isPostOwner={post?.authorId === currentUserId}
-            currentUserId={currentUserId}
-            isSuperAdmin={isSuperAdmin}
-            isEditing={editingId === comment.id}
-            editValue={editingValue}
-            onEditStart={() => handleEditStart(comment)}
-            onEditCancel={handleEditCancel}
-            onEditSave={handleEditSave}
-            onEditChange={setEditingValue}
-            onDelete={handleDeleteComment}
-          />
-        ))}
-        <div className="mt-2">
-          <CommentForm onSubmit={handleAddComment} />
-        </div>
-      </div>
+    <div className="bg-white rounded-xl shadow p-4 mt-2">
+      {comments.map((comment) => (
+        <CommentItem
+          key={comment.id}
+          comment={comment}
+          isPostOwner={post.userId === currentUserId}
+          currentUserId={currentUserId}
+          isSuperAdmin={typeof isSuperAdmin === 'function' ? isSuperAdmin() : !!isSuperAdmin}
+          isEditing={editingId === comment.id}
+          editValue={editingValue}
+          onEditStart={() => handleEditStart(comment)}
+          onEditCancel={handleEditCancel}
+          onEditSave={handleEditSave}
+          onEditChange={setEditingValue}
+          onDelete={() => handleDelete(comment.id)}
+        />
+      ))}
+      <CommentForm onSubmit={handleAdd} />
       <ConfirmModal
         open={!!deleteId}
-        onClose={cancelDeleteComment}
-        onConfirm={confirmDeleteComment}
-        title="Delete Comment"
-        description="Are you sure you want to delete this comment? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Supprimer le commentaire ?"
+        description="Cette action est irréversible."
       />
     </div>
   );

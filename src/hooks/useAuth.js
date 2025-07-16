@@ -1,21 +1,11 @@
 "use client";
-import { useEffect, useState } from 'react';
-import keycloak from '@/services/auth/keycloak';
+import { useSelector } from 'react-redux';
 
 export default function useAuth() {
-  const [kc, setKc] = useState(null);
-  const [token, setToken] = useState(null);
+  const keycloak = null; // Keycloak instance n'est plus exposée ici
+  const token = useSelector(state => state.auth.token);
+  const user = useSelector(state => state.auth.user);
+  const authenticated = useSelector(state => state.auth.isAuthenticated);
 
-  useEffect(() => {
-    keycloak.init({ onLoad: 'login-required' }).then(auth => {
-      if (auth) {
-        setKc(keycloak);
-        setToken(keycloak.token);
-        // refresh token every 60 s
-        setInterval(() => keycloak.updateToken(30).then(r => r && setToken(keycloak.token)), 60000);
-      }
-    });
-  }, []);
-
-  return { keycloak: kc, token, authenticated: !!token, user: kc?.tokenParsed };
+  return { keycloak, token, authenticated, user };
 }

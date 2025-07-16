@@ -1,11 +1,20 @@
 import axios from 'axios';
-import { useAuthStore } from '@/store/authStore';
+// Remove direct import of the store
+// import { store } from '@/store/store';
+
+let getStateAccessor = null;
+
+export function setStoreAccessors({ getState }) {
+  getStateAccessor = getState;
+}
 
 const api = axios.create({ baseURL: 'http://localhost:8084/api' });
 
 api.interceptors.request.use(config => {
-  const token = useAuthStore.getState().token;
-  const user = useAuthStore.getState().user;
+  // Use the injected getState accessor
+  const state = getStateAccessor ? getStateAccessor() : {};
+  const token = state.auth?.token;
+  const user = state.auth?.user;
   
   // Send Authorization header for all real tokens
   if (token) {
@@ -16,6 +25,9 @@ api.interceptors.request.use(config => {
   if (user?.username) {
     config.headers['X-Frontend-User'] = user.username;
   }
+
+  // Debug: log headers to confirm Authorization is set
+  console.log('API request headers:', config.headers);
   
   return config;
 });

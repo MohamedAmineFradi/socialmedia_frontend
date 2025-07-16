@@ -1,45 +1,35 @@
-import { useEffect, useState, useRef } from "react";
-import { getProfileByUserId } from "@/services/profileService";
-
-// Simple in-memory cache for profiles
-const profileCache = {};
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchProfile, updateProfile, clearProfile } from '@/store/profileSlice';
+import { useEffect, useRef } from 'react';
 
 export default function useProfile(userId) {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(!!userId);
-  const [error, setError] = useState(null);
-  const isMounted = useRef(true);
+  const dispatch = useDispatch();
+  const profile = useSelector(state => state.profile.entities[userId]);
+  const loading = useSelector(state => state.profile.loadingById[userId] || false);
+  const error = useSelector(state => state.profile.error);
+
+  const prevUserId = useRef();
 
   useEffect(() => {
-    isMounted.current = true;
-    if (!userId) {
-      setProfile(null);
-      setLoading(false);
-      return;
+    if (prevUserId.current && prevUserId.current !== userId) {
+      dispatch(clearProfile());
     }
-    setLoading(true);
-    setError(null);
-    if (profileCache[userId]) {
-      setProfile(profileCache[userId]);
-      setLoading(false);
-    } else {
-      getProfileByUserId(userId)
-        .then((data) => {
-          profileCache[userId] = data;
-          if (isMounted.current) setProfile(data);
-        })
-        .catch((err) => {
-          console.error('Error fetching profile for user:', userId, err);
-          if (isMounted.current) setError(err);
-        })
-        .finally(() => {
-          if (isMounted.current) setLoading(false);
-        });
-    }
-    return () => {
-      isMounted.current = false;
-    };
-  }, [userId]);
+    
+    const shouldFetch = userId !== null && userId !== undefined && userId !== '' && !Number.isNaN(Number(userId)) &&
+      (prevUserId.current !== userId || !profile);
 
-  return { profile, loading, error };
+    prevUserId.current = userId;
+    // Only dispatch if necessary
+    if (shouldFetch) {
+      dispatch(fetchProfile(userId));
+    } else {
+      if (userId !== undefined && (userId === null || userId === '' || Number.isNaN(Number(userId)))) {
+        console.warn('useProfile: userId is invalid, skipping fetchProfile. userId =', userId);
+      }
+    }
+  }, [userId, dispatch, profile]);
+
+  const handleUpdateProfile = (profileData) => dispatch(updateProfile({ userId, profileData }));
+
+  return { profile, loading, error, handleUpdateProfile };
 } 

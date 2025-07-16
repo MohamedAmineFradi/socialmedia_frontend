@@ -1,27 +1,23 @@
 "use client";
 
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PostHeader from "./PostHeader";
 import PostContent from "./PostContent";
 import PostFooter from "./PostFooter";
 import SocialShareModal from "@/components/ui/SocialShareModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { getProfileByUserId } from "@/services/profileService";
 import useProfile from "@/hooks/useProfile";
+import useReactions from "@/hooks/useReactions";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function PostCard({
   post,
   onLongPress,
   showPicker,
   onClosePicker,
-  onPickReaction,
-  onCommentsClick,
-  isCommentsOpen,
   onEdit,
   onDelete,
-  userReaction,
-  pendingReaction,
   currentUserId,
   isSuperAdmin,
 }) {
@@ -31,6 +27,8 @@ export default function PostCard({
   const canEdit = isOwn || isSuperAdmin;
 
   const { profile: authorProfile, loading: loadingProfile } = useProfile(post.authorId);
+  const { user } = useAuth();
+  const { pending, handleAddReaction, handleDeleteReaction } = useReactions(post.id);
 
   function handleEditStart() {
     setIsEditing(true);
@@ -42,8 +40,15 @@ export default function PostCard({
 
   function handleEditSave(newContent) {
     if (onEdit) {
-      onEdit(post.id, newContent);
-      setIsEditing(false);
+      onEdit(post.id, newContent)
+        .then(() => {
+          setIsEditing(false);
+          // Optimistically update UI: Redux state is updated by the fulfilled reducer
+          // console.log('Post edited successfully, UI updated via Redux');
+        })
+        .catch((err) => {
+          console.error('Failed to edit post, consider refetching...', err);
+        });
     }
   }
 
@@ -53,7 +58,7 @@ export default function PostCard({
 
   function confirmDelete() {
     if (onDelete) {
-      onDelete(post.id);
+      onDelete(post.id, currentUserId);
     }
     setShowDeleteModal(false);
   }
@@ -63,54 +68,60 @@ export default function PostCard({
   }
 
   function handleLike() {
-    onPickReaction("👍");
+    if (!currentUserId) return; // Defensive: don't call if no user ID
+    if (post.userReaction && post.userReaction.type === "LIKE") {
+      // Supprimer la réaction
+      handleDeleteReaction(post.userReaction.id, currentUserId);
+    } else {
+      handleAddReaction(currentUserId, "LIKE");
+    }
   }
 
   function handleDislike() {
-    onPickReaction("👎");
+    if (!currentUserId) return; // Defensive: don't call if no user ID
+    if (post.userReaction && post.userReaction.type === "DISLIKE") {
+      // Supprimer la réaction
+      handleDeleteReaction(post.userReaction.id, currentUserId);
+    } else {
+      handleAddReaction(currentUserId, "DISLIKE");
+    }
   }
 
   return (
-    <>
-      <div className="bg-white rounded-2xl shadow p-6 border border-[#009ddb]/10">
-        <PostHeader
-          post={post}
-          authorProfile={authorProfile}
-          loadingProfile={loadingProfile}
-          isOwn={isOwn}
-          canEdit={canEdit}
-          onEditStart={handleEditStart}
-          onDelete={handleDelete}
-        />
-        <PostContent
-          post={post}
-          isEditing={isEditing}
-          onEditCancel={handleEditCancel}
-          onEditSave={handleEditSave}
-        />
-        <PostFooter
-          likes={post.likes || 0}
-          dislikes={post.dislikes || 0}
-          commentCount={post.commentCount || 0}
-          onLike={handleLike}
-          onDislike={handleDislike}
-          onCommentsClick={onCommentsClick}
-          isCommentsOpen={isCommentsOpen}
-          userReaction={userReaction}
-          pendingReaction={pendingReaction}
-        />
-      </div>
-
+    <div className="bg-white rounded-2xl shadow p-6 border border-[#009ddb]/10 mb-4">
+      <PostHeader
+        post={post}
+        authorProfile={authorProfile}
+        loadingProfile={loadingProfile}
+        isOwn={isOwn}
+        canEdit={canEdit}
+        onEditStart={handleEditStart}
+        onDelete={handleDelete}
+      />
+      <PostContent post={post} isEditing={isEditing} onEditSave={handleEditSave} onEditCancel={handleEditCancel} />
+      <PostFooter
+        post={post}
+        onLike={handleLike}
+        onDislike={handleDislike}
+        pendingReaction={pending}
+        showPicker={showPicker}
+        onLongPress={onLongPress}
+        onClosePicker={onClosePicker}
+        currentUserId={currentUserId}
+        onCommentsClick={() => {
+          if (typeof window !== 'undefined' && window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('toggleComments', { detail: { postId: post.id } }));
+          }
+        }}
+      />
       <ConfirmModal
         open={showDeleteModal}
         onClose={cancelDelete}
         onConfirm={confirmDelete}
-        title="Delete Post"
-        description="Are you sure you want to delete this post? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title="Supprimer le post ?"
+        description="Cette action est irréversible."
       />
-    </>
+    </div>
   );
 }
 
@@ -119,11 +130,8 @@ PostCard.propTypes = {
   onLongPress: PropTypes.func.isRequired,
   showPicker: PropTypes.bool,
   onClosePicker: PropTypes.func.isRequired,
-  onPickReaction: PropTypes.func.isRequired,
-  onCommentsClick: PropTypes.func.isRequired,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
-  userReaction: PropTypes.string,
   currentUserId: PropTypes.string.isRequired,
   isSuperAdmin: PropTypes.bool,
 }; 

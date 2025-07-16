@@ -19,7 +19,6 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col justify-between bg-[#1da1f2] p-0">
       <div className="flex flex-1 flex-col md:flex-row items-center justify-center gap-0 md:gap-12 w-full max-w-5xl mx-auto py-12">
-        {/* Logo section (left on desktop, top on mobile) */}
         <div className="flex-1 flex items-center justify-center p-4">
           <Image
             src="/logo_with_blue_bg.png"

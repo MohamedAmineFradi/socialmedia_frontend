@@ -1,33 +1,36 @@
-import { useState, useCallback } from "react";
-import {
-  addComment as addCommentApi,
-  editComment as editCommentApi,
-  deleteComment as deleteCommentApi,
-} from "@/services/commentService";
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchComments, addComment, editComment, deleteComment } from '@/store/commentsSlice';
+import { useEffect, useRef, useMemo } from 'react';
 
-export default function useComments(postId, initialComments = [], currentUserId) {
-  const [comments, setComments] = useState(initialComments);
+export default function useComments(postId, currentUserId, refreshKey) {
+  const dispatch = useDispatch();
+  // Memoize the empty array and fallback object
+  const EMPTY_ARRAY = useMemo(() => [], []);
+  const EMPTY_STATE = useMemo(() => ({ items: EMPTY_ARRAY, loading: false, error: null }), [EMPTY_ARRAY]);
+  const commentsState = useSelector(state => state.comments.byPost[postId] || EMPTY_STATE);
+  const { items: comments, loading, error } = commentsState;
 
-  const handleAddComment = useCallback(async (commentText) => {
-    const newComment = await addCommentApi(postId, currentUserId, { content: commentText });
-    setComments((prev) => [...prev, newComment]);
-    return newComment;
-  }, [postId, currentUserId]);
+  const prevPostId = useRef();
 
-  const handleEditComment = useCallback(async (commentId, newText) => {
-    await editCommentApi(commentId, currentUserId, { content: newText });
-    // Optionally, refetch or update local state
-    setComments((prev) => prev.map(c => c.id === commentId ? { ...c, content: newText } : c));
-  }, [currentUserId]);
+  useEffect(() => {
+    const postChanged = prevPostId.current !== postId;
+    prevPostId.current = postId;
 
-  const handleDeleteComment = useCallback(async (commentId) => {
-    await deleteCommentApi(commentId, currentUserId);
-    setComments((prev) => prev.filter(c => c.id !== commentId));
-  }, [currentUserId]);
+    // Ne fetch que si le post change OU si aucun commentaire en cache
+    const cached = comments?.length > 0;
+    if (postId && (postChanged || !cached || refreshKey !== undefined)) {
+      dispatch(fetchComments(postId));
+    }
+  }, [postId, comments.length, dispatch, refreshKey]);
+
+  const handleAddComment = (commentText) => dispatch(addComment({ postId, content: commentText }));
+  const handleEditComment = (commentId, newText) => dispatch(editComment({ commentId, userId: currentUserId, commentData: { content: newText }, postId }));
+  const handleDeleteComment = (commentId, postId) => dispatch(deleteComment({ commentId, postId, userId: currentUserId }));
 
   return {
     comments,
-    setComments,
+    loading,
+    error,
     handleAddComment,
     handleEditComment,
     handleDeleteComment,

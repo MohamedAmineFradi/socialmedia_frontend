@@ -1,146 +1,57 @@
-import { useState, useEffect, useCallback } from "react";
-import {
-  getPosts,
-  addPost as addPostApi,
-  editPost as editPostApi,
-  deletePost as deletePostApi,
-  addReaction as addReactionApi,
-  deleteReaction as deleteReactionApi,
-} from "@/services/postService";
-import {
-  addComment as addCommentApi,
-  editComment as editCommentApi,
-  deleteComment as deleteCommentApi,
-} from "@/services/commentService";
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchGlobalPosts, fetchUserPosts, addPost, editPost, deletePost } from '@/store/postsSlice';
+import { useEffect, useRef } from 'react';
+import { useAuth } from '@/components/auth/AuthProvider';
 
-export default function usePosts(currentUserId, initialPosts = []) {
-  const [posts, setPosts] = useState(initialPosts);
-  const [pendingReaction, setPendingReaction] = useState({}); // { [postId]: boolean }
+export default function usePosts(rawUserId = null) {
+  // Normalize key: use string for dictionary keys to avoid 1 vs "1" issues
+  const userId = rawUserId === null || rawUserId === undefined ? null : String(rawUserId);
+  const dispatch = useDispatch();
 
-  // Fetch posts on mount
+  // Need auth state to ensure we have JWT before hitting protected /posts endpoint
+  const { isAuthenticated } = useAuth();
+
+  const EMPTY_ARRAY = [];
+  const posts = useSelector(state =>
+    userId ? state.posts.byUserId[userId] || EMPTY_ARRAY : state.posts.global
+  );
+  const loading = useSelector(state =>
+    userId ? state.posts.loadingByUserId[userId] || false : state.posts.loadingGlobal
+  );
+
+  // Flags whether we already loaded once
+  const loadedGlobal = useSelector(state => state.posts.loadedGlobal);
+  const loadedByUser = useSelector(state => state.posts.loadedByUserId[userId]);
+
+  const prevUserId = useRef(); // kept for possible future but no clearing
+
   useEffect(() => {
-    getPosts(currentUserId).then(setPosts);
-  }, [currentUserId]);
+    // No automatic cache clearing here – rely on resetPosts on logout
 
-  // Post CRUD
-  const handlePublish = useCallback(async (content) => {
-    const newPost = await addPostApi(currentUserId, { content });
-    setPosts((prev) => [newPost, ...prev]);
-  }, [currentUserId]);
-
-  const handleEditPost = useCallback(async (postId, newContent) => {
-    await editPostApi(postId, currentUserId, { content: newContent });
-    getPosts(currentUserId).then(setPosts);
-  }, [currentUserId]);
-
-  const handleDeletePost = useCallback(async (postId) => {
-    await deletePostApi(postId, currentUserId);
-    setPosts((prev) => prev.filter(post => post.id !== postId));
-  }, [currentUserId]);
-
-  // Reaction logic
-  const handlePickReaction = useCallback(async (postId, emoji) => {
-    if (pendingReaction[postId]) return;
-    setPendingReaction((prev) => ({ ...prev, [postId]: true }));
-    const reactionType = emoji === "👍" ? "LIKE" : emoji === "👎" ? "DISLIKE" : null;
-    if (!reactionType) {
-      setPendingReaction((prev) => ({ ...prev, [postId]: false }));
-      return;
-    }
-    const post = posts.find(p => p.id === postId);
-    const userReaction = post.userReaction;
-    if (userReaction && userReaction.type === reactionType) {
-      // Remove reaction
-      if (!userReaction.id) {
-        console.error("userReaction.id is missing!", userReaction);
-        setPendingReaction((prev) => ({ ...prev, [postId]: false }));
-        getPosts(currentUserId).then(setPosts);
-        return;
+    // Fetch posts only if we don't have them yet and not already loading
+    if (userId === null) {
+      // Only fetch global feed after we are authenticated (token present)
+      if (isAuthenticated && !loading && !loadedGlobal) {
+        dispatch(fetchGlobalPosts());
       }
-      // Optimistically update UI
-      setPosts((prevPosts) => prevPosts.map(post =>
-        post.id === postId ? { 
-          ...post, 
-          userReaction: null,
-          likes: post.likes - (reactionType === "LIKE" ? 1 : 0),
-          dislikes: post.dislikes - (reactionType === "DISLIKE" ? 1 : 0)
-        } : post
-      ));
-      await deleteReactionApi(userReaction.id, currentUserId);
-    } else {
-      // Add reaction
-      setPosts((prevPosts) => prevPosts.map(post => {
-        if (post.id !== postId) return post;
-        let likes = post.likes || 0;
-        let dislikes = post.dislikes || 0;
-        // Remove previous reaction if exists
-        if (post.userReaction) {
-          if (post.userReaction.type === "LIKE") likes--;
-          if (post.userReaction.type === "DISLIKE") dislikes--;
-        }
-        // Add new reaction
-        if (reactionType === "LIKE") likes++;
-        if (reactionType === "DISLIKE") dislikes++;
-        return { 
-          ...post, 
-          likes, 
-          dislikes, 
-          userReaction: { type: reactionType } 
-        };
-      }));
-      await addReactionApi(postId, currentUserId, reactionType);
+    } else if (userId) {
+      if (isAuthenticated && !loading && !loadedByUser) {
+        dispatch(fetchUserPosts(userId));
+      }
     }
-    getPosts(currentUserId).then(setPosts);
-    setPendingReaction((prev) => ({ ...prev, [postId]: false }));
-  }, [currentUserId, pendingReaction, posts]);
 
-  // Comment CRUD
-  const handleAddComment = useCallback(async (postId, commentText) => {
-    const newComment = await addCommentApi(postId, currentUserId, { content: commentText });
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? { 
-              ...post, 
-              comments: [...(post.comments || []), newComment], 
-              commentCount: (post.commentCount || 0) + 1 
-            }
-          : post
-      )
-    );
-  }, [currentUserId]);
+    prevUserId.current = userId;
+  }, [userId, dispatch, loading, isAuthenticated, loadedGlobal, loadedByUser]);
 
-  const handleEditComment = useCallback(async (postId, commentId, newText) => {
-    await editCommentApi(commentId, currentUserId, { content: newText });
-    // Refetch posts to get updated data
-    getPosts(currentUserId).then(setPosts);
-  }, [currentUserId]);
-
-  const handleDeleteComment = useCallback(async (postId, commentId) => {
-    await deleteCommentApi(commentId, currentUserId);
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              comments: (post.comments || []).filter((c) => c.id !== commentId),
-              commentCount: Math.max(0, (post.commentCount || 1) - 1),
-            }
-          : post
-      )
-    );
-  }, [currentUserId]);
+  const handlePublish = (content) => dispatch(addPost({ userId, content }));
+  const handleEditPost = (postId, content) => dispatch(editPost({ postId, userId, content }));
+  const handleDeletePost = (postId, deleteUserId = userId) => dispatch(deletePost({ postId, userId: deleteUserId }));
 
   return {
     posts,
-    setPosts,
-    pendingReaction,
+    loading,
     handlePublish,
     handleEditPost,
     handleDeletePost,
-    handlePickReaction,
-    handleAddComment,
-    handleEditComment,
-    handleDeleteComment,
   };
 } 

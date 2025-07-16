@@ -1,8 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import authService from '@/services/auth/authService';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { login as loginAction, logout as logoutAction, setUser, setToken } from '@/store/authSlice';
+import { clearProfile } from '@/store/profileSlice';
+import { resetPosts } from '@/store/postsSlice';
+import { clearComments } from '@/store/commentsSlice';
+import { clearReactions } from '@/store/reactionsSlice';
+import authService, { extractRolesFromToken } from '@/services/auth/authService';
 
 const AuthContext = createContext();
 
@@ -19,7 +24,9 @@ export default function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [mounted, setMounted] = useState(false);
-  const { isAuthenticated, user, login, logout } = useAuthStore();
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+  const user = useSelector(state => state.auth.user);
 
   // Ensure component is mounted on client
   useEffect(() => {
@@ -39,10 +46,15 @@ export default function AuthProvider({ children }) {
         
         if (authenticated) {
           console.log('User is authenticated with Keycloak');
+          // Extract roles from token and set in Redux user
+          const token = authService.token || (authService.keycloak && authService.keycloak.token);
+          if (token) {
+            const roles = extractRolesFromToken(token);
+            dispatch(setUser({ ...authService.user, roles }));
+          }
         } else {
           console.log('User is not authenticated');
         }
-        
         setIsInitialized(true);
       } catch (error) {
         console.error('Auth initialization failed:', error);
@@ -69,11 +81,29 @@ export default function AuthProvider({ children }) {
   const handleLogout = async () => {
     try {
       await authService.logout();
+      dispatch(logoutAction());
+      dispatch(clearProfile());
+      dispatch(resetPosts());
+      dispatch(clearComments());
+      dispatch(clearReactions());
     } catch (error) {
       console.error('Logout failed:', error);
       setError(error.message || 'Logout failed.');
     }
   };
+
+  // Stable helper callbacks to prevent re-creation on each render.
+  const hasRole = useCallback((role) => {
+    return user?.roles?.includes(role);
+  }, [user]);
+
+  const isSuperAdmin = useCallback(() => {
+    return user?.roles?.includes('superAdmin');
+  }, [user]);
+
+  const refreshUserRoles = useCallback(() => {
+    return authService.refreshUserRoles ? authService.refreshUserRoles() : undefined;
+  }, []);
 
   const value = {
     isAuthenticated,
@@ -83,9 +113,9 @@ export default function AuthProvider({ children }) {
     error,
     login: handleLogin,
     logout: handleLogout,
-    hasRole: authService.hasRole.bind(authService),
-    isSuperAdmin: authService.isSuperAdmin.bind(authService),
-    refreshUserRoles: authService.refreshUserRoles.bind(authService)
+    hasRole,
+    isSuperAdmin,
+    refreshUserRoles,
   };
 
   // Don't render anything until mounted on client

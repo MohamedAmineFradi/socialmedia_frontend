@@ -1,21 +1,39 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import useAuth from "@/hooks/useAuth";
+import { getUser } from "@/services/userService";
 // TODO: Replace with real backend stats API when available
 
 export default function UserStats() {
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     posts: 0,
     comments: 0,
-    likes: 0,
-    followers: 0,
-    following: 0
+    likes: 0, // Not available in backend, keep as 0 or fetch if available
+    followers: 0, // Not available in backend, keep as 0 or fetch if available
+    following: 0 // Not available in backend, keep as 0 or fetch if available
   });
 
   useEffect(() => {
-    // Placeholder: set all stats to 0 or fetch from backend if available
-    setStats({ posts: 0, comments: 0, likes: 0, followers: 0, following: 0 });
-  }, []);
+    const fetchStats = async () => {
+      if (user?.id) {
+        try {
+          const userData = await getUser(user.id);
+          setStats({
+            posts: userData.postCount || 0,
+            comments: userData.commentCount || 0,
+            likes: userData.reactionCount || 0,
+            followers: 0, // TODO: brancher si dispo
+            following: 0  // TODO: brancher si dispo
+          });
+        } catch (error) {
+          setStats({ posts: 0, comments: 0, likes: 0, followers: 0, following: 0 });
+        }
+      }
+    };
+    fetchStats();
+  }, [user?.id]);
 
   return (
     <div className="bg-white rounded-2xl shadow p-6 border border-[#009ddb]/10">

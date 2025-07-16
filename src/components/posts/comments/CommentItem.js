@@ -2,6 +2,7 @@
 
 import PropTypes from "prop-types";
 import { useState } from "react";
+import useProfile from "@/hooks/useProfile";
 
 export default function CommentItem({ 
   comment, 
@@ -18,7 +19,8 @@ export default function CommentItem({
 }) {
   const [avatarError, setAvatarError] = useState(false);
 
-  // Remove local isEditing/editContent state
+  // Fetch profile info for the comment's author
+  const { profile: authorProfile, loading: profileLoading } = useProfile(comment.userId);
 
   function handleEditSave() {
     onEditSave(comment.id, editValue);
@@ -32,19 +34,37 @@ export default function CommentItem({
     setAvatarError(true);
   };
 
-  // Fallback avatar URL using UI Avatars service
-  const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author)}&background=009ddb&color=fff&size=32`;
-  const avatarUrl = (comment.avatar && !avatarError) ? comment.avatar : fallbackAvatar;
+  // Prefer profile avatar, fallback to comment.avatar, then fallback avatar
+  const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(authorProfile?.name || comment.author || "User")}&background=009ddb&color=fff&size=32`;
+  const avatarUrl = (authorProfile?.avatar && !avatarError)
+    ? authorProfile.avatar
+    : (comment.avatar && !avatarError)
+      ? comment.avatar
+      : fallbackAvatar;
+
+  // Prefer profile name/username, fallback to comment fields, then clear fallback
+  let displayName;
+  if (profileLoading) {
+    displayName = 'Loading...';
+  } else {
+    displayName = authorProfile?.name || comment.author || 'Unknown User';
+  }
+  let displayUsername;
+  if (profileLoading) {
+    displayUsername = '';
+  } else {
+    displayUsername = authorProfile?.username || comment.username || '';
+  }
 
   // Check if user can edit/delete this comment
-  const isOwnComment = comment.authorId === currentUserId;
+  const isOwnComment = comment.userId === currentUserId;
   const canEditComment = isOwnComment || isSuperAdmin;
 
   return (
     <div className="flex items-start gap-3">
       <img
         src={avatarUrl}
-        alt={comment.author}
+        alt={displayName}
         className="w-8 h-8 rounded-full object-cover bg-white/20 border border-white/30"
         loading="lazy"
         onError={handleAvatarError}
@@ -52,17 +72,17 @@ export default function CommentItem({
       <div className="flex-1">
         <div className="flex items-center justify-between">
           <div>
-            <span className="font-semibold text-white">
-              {comment.author}
+            <span className="font-semibold text-black">
+              {displayName}
             </span>
-            {comment.username && (
-              <span className="ml-2 text-xs text-white/60">@{comment.username}</span>
+            {displayUsername && (
+              <span className="ml-2 text-xs text-black/70">@{displayUsername}</span>
             )}
-            <span className="ml-2 text-white/70 text-xs">
-              {comment.minutesAgo} min ago
+            <span className="ml-2 text-black/50 text-xs">
+              {typeof comment.minutesAgo === 'number' ? `${comment.minutesAgo} min ago` : ''}
             </span>
           </div>
-          {(comment.authorId === currentUserId || isPostOwner || isSuperAdmin) && !isEditing && (
+          {(comment.userId === currentUserId || isPostOwner || isSuperAdmin) && !isEditing && (
             <div className="flex gap-2">
               {canEditComment && (
                 <button 
@@ -93,14 +113,16 @@ export default function CommentItem({
             />
             <div className="flex justify-end gap-2 mt-1">
               <button 
+                type="button"
                 onClick={onEditCancel}
-                className="px-2 py-0.5 text-xs rounded bg-white/20 hover:bg-white/30 text-white"
+                className="px-2 py-0.5 text-xs rounded bg-white/20 hover:bg-white/30 text-black border border-gray-300"
               >
                 Cancel
               </button>
               <button 
+                type="button"
                 onClick={handleEditSave}
-                className="px-2 py-0.5 text-xs rounded bg-[#fde848] hover:bg-[#fb5c1d] text-[#009ddb]"
+                className="px-2 py-0.5 text-xs rounded bg-[#fde848] hover:bg-[#fb5c1d] text-[#009ddb] border border-gray-300"
                 disabled={!editValue.trim()}
               >
                 Save
@@ -108,8 +130,8 @@ export default function CommentItem({
             </div>
           </div>
         ) : (
-          <p className="text-white text-sm whitespace-pre-line">
-            {comment.text}
+          <p className="text-black text-sm whitespace-pre-line">
+            {comment.text || comment.content}
           </p>
         )}
       </div>
@@ -121,7 +143,7 @@ CommentItem.propTypes = {
   comment: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     author: PropTypes.string.isRequired,
-    authorId: PropTypes.number.isRequired,
+    userId: PropTypes.number.isRequired,
     text: PropTypes.string.isRequired,
     minutesAgo: PropTypes.number.isRequired,
     username: PropTypes.string,

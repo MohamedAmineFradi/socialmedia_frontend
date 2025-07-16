@@ -2,23 +2,18 @@
 
 import PropTypes from "prop-types";
 import { useState } from "react";
-import { addPost } from "@/services/postService";
+import usePosts from "@/hooks/usePosts";
 
 export default function PostForm({ onSubmit, userId }) {
   const [draft, setDraft] = useState("");
+  const { handlePublish } = usePosts(userId);
 
   function handleSubmit(e) {
     e.preventDefault();
     if (!draft.trim() || !userId) return;
-    
-    // Add post to backend
-    addPost(userId, { content: draft });
-    
-    // Call parent component's onSubmit
     if (onSubmit) {
       onSubmit(draft);
     }
-    
     setDraft("");
   }
 

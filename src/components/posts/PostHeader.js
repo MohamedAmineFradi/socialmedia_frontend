@@ -15,9 +15,21 @@ export default function PostHeader({
   const [avatarError, setAvatarError] = useState(false);
   
   // Extract data from post and authorProfile
-  const author = authorProfile?.displayName || post.authorName || post.authorUsername || "Unknown User";
+  const author = authorProfile?.name || post.authorName || "Unknown User";
   const avatar = authorProfile?.avatar;
   const username = authorProfile?.username || post.authorUsername;
+
+  if (loadingProfile && !authorProfile) {
+    return (
+      <header className="flex items-center gap-3 mb-2 animate-pulse">
+        <div className="w-10 h-10 rounded-full bg-gray-200" />
+        <div className="flex-1">
+          <div className="h-4 bg-gray-200 rounded w-24 mb-1" />
+          <div className="h-3 bg-gray-100 rounded w-16" />
+        </div>
+      </header>
+    );
+  }
   
   // Calculate minutes ago from post creation date
   const minutesAgo = post.createdAt 

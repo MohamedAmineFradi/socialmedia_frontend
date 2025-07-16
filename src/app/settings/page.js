@@ -4,9 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getProfileByUserId, updateProfile } from "@/services/profileService";
 import api from "@/services/api";
+import { useDispatch } from "react-redux";
+import { fetchProfile } from "@/store/profileSlice";
 
 export default function SettingsPage() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [profile, setProfile] = useState({
     name: "",
     username: "",
@@ -17,7 +20,7 @@ export default function SettingsPage() {
     avatar: "",
     info: ""
   });
-  const [profileId, setProfileId] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -45,7 +48,7 @@ export default function SettingsPage() {
           avatar: profileData.avatar || "",
           info: profileData.info || ""
         });
-        setProfileId(profileData.id);
+        setUserId(userInfo.id);
       }
     } catch (error) {
       console.error('Failed to fetch user or profile:', error);
@@ -64,7 +67,11 @@ export default function SettingsPage() {
     e.preventDefault();
     setIsSaving(true);
     try {
-      await updateProfile(profileId, profile);
+      await updateProfile(userId, profile);
+      // Refresh Redux profile state so ProfileHeader/Sidebar re-render
+      if (userId) {
+        dispatch(fetchProfile(userId));
+      }
       setSaveMessage("Profile updated successfully!");
       setTimeout(() => {
         setSaveMessage("");
