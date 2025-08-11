@@ -10,9 +10,9 @@ export default function UserStats() {
   const [stats, setStats] = useState({
     posts: 0,
     comments: 0,
-    likes: 0, // Not available in backend, keep as 0 or fetch if available
-    followers: 0, // Not available in backend, keep as 0 or fetch if available
-    following: 0 // Not available in backend, keep as 0 or fetch if available
+    likes: 0,
+    followers: 0,
+    following: 0
   });
 
   useEffect(() => {
@@ -24,8 +24,8 @@ export default function UserStats() {
             posts: userData.postCount || 0,
             comments: userData.commentCount || 0,
             likes: userData.reactionCount || 0,
-            followers: 0, // TODO: brancher si dispo
-            following: 0  // TODO: brancher si dispo
+            followers: 0,
+            following: 0
           });
         } catch (error) {
           setStats({ posts: 0, comments: 0, likes: 0, followers: 0, following: 0 });

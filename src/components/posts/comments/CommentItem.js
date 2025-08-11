@@ -19,7 +19,6 @@ export default function CommentItem({
 }) {
   const [avatarError, setAvatarError] = useState(false);
 
-  // Fetch profile info for the comment's author
   const { profile: authorProfile, loading: profileLoading } = useProfile(comment.userId);
 
   function handleEditSave() {
@@ -34,7 +33,6 @@ export default function CommentItem({
     setAvatarError(true);
   };
 
-  // Prefer profile avatar, fallback to comment.avatar, then fallback avatar
   const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(authorProfile?.name || comment.author || "User")}&background=009ddb&color=fff&size=32`;
   const avatarUrl = (authorProfile?.avatar && !avatarError)
     ? authorProfile.avatar
@@ -42,7 +40,6 @@ export default function CommentItem({
       ? comment.avatar
       : fallbackAvatar;
 
-  // Prefer profile name/username, fallback to comment fields, then clear fallback
   let displayName;
   if (profileLoading) {
     displayName = 'Loading...';
@@ -56,7 +53,6 @@ export default function CommentItem({
     displayUsername = authorProfile?.username || comment.username || '';
   }
 
-  // Check if user can edit/delete this comment
   const isOwnComment = comment.userId === currentUserId;
   const canEditComment = isOwnComment || isSuperAdmin;
 

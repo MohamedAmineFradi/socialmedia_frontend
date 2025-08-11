@@ -84,8 +84,6 @@ class AuthService {
   async handleSuccessfulAuth() {
     console.log('Handling successful authentication...');
     const token = this.keycloak.token;
-
-    // Put the token in Redux immediately so API calls have the Authorization header
     if (token) {
       store.dispatch(setToken(token));
     }
@@ -120,8 +118,8 @@ class AuthService {
     }
     
     const user = {
-      id: backendUserInfo?.id || this.keycloak.subject, // DB user ID if available, else Keycloak UUID
-      keycloakId: this.keycloak.subject, // Always store Keycloak UUID separately
+      id: backendUserInfo?.id || this.keycloak.subject,
+      keycloakId: this.keycloak.subject,
       username: this.keycloak.tokenParsed?.preferred_username,
       email: this.keycloak.tokenParsed?.email,
       firstName: this.keycloak.tokenParsed?.given_name,
@@ -146,7 +144,6 @@ class AuthService {
     };
   }
 
-  // Helper method to assign default roles based on username
   getDefaultRoles(username) {
     if (username === 'admin') {
       return ['superAdmin'];
@@ -225,7 +222,6 @@ class AuthService {
 const authService = new AuthService();
 export default authService; 
 
-// Add this function to extract roles from the Keycloak token
 export function extractRolesFromToken(token) {
   if (!token) return [];
   try {

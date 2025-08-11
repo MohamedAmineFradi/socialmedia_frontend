@@ -6,6 +6,5 @@ export function mapNotificationResponseToUI(notification) {
     type: notification.type,
     message: notification.message,
     createdAt: notification.createdAt,
-    // Add more fields as needed
   };
 } 

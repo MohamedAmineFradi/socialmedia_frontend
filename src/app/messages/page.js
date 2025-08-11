@@ -1,5 +1,6 @@
-import MessagesList from "@/components/messages/MessagesList";
+"use client";
+import Chat from '@/components/Chat';
 
 export default function MessagesPage() {
-  return <MessagesList />;
-} 
+  return <Chat />;
+}

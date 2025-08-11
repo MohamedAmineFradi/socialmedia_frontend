@@ -6,7 +6,6 @@ export const getComments = async (postId) => {
 };
 
 export const addComment = async (postId, commentData) => {
-  // Backend expects postId as query param and infers user from JWT
   const { data } = await api.post(`/comments?postId=${postId}`, commentData);
   return data;
 };
@@ -21,6 +20,5 @@ export const editComment = async (commentId, userId, commentData) => {
 };
 
 export const deleteComment = async (commentId, userId) => {
-  // Backend validates user via JWT; path now includes userId
   await api.delete(`/comments/${commentId}/user/${userId}`);
 }; 

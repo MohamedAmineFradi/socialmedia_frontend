@@ -1,16 +1,13 @@
 import api from './api';
 
-// Fetch the current user's reaction for a post
 export const getUserReactionForPost = async (postId, userId) => {
   if (!userId) {
-    // Don't even warn, just skip
     return null;
   }
   try {
     const { data } = await api.get(`/reactions/post/${postId}/user/${userId}`);
-    return data; // { id, type, ... }
+    return data;
   } catch (err) {
-    // 404 means no reaction
     return null;
   }
 };
@@ -20,10 +17,8 @@ const EMPTY_ARRAY = [];
 export const getPosts = async (currentUserId) => {
   const { data: posts } = await api.get('/posts');
   if (!currentUserId) {
-    // No userId, skip userReaction
     return posts.map(post => ({ ...post, userReaction: null }));
   }
-  // Attach userReaction (type + id) to each post
   const postsWithUserReaction = await Promise.all(
     posts.map(async (post) => {
       const userReaction = await getUserReactionForPost(post.id, currentUserId);
@@ -56,13 +51,11 @@ export const deletePost = async (postId, userId) => {
   return data;
 };
 
-// Reaction endpoint requires userId
 export const addReaction = async (postId, userId, reactionType) => {
   const { data } = await api.post(`/reactions/post/${postId}/user/${userId}`, { type: reactionType });
   return data;
 };
 
-// Delete a reaction by reactionId and userId
 export const deleteReaction = async (reactionId, userId) => {
   await api.delete(`/reactions/${reactionId}/user/${userId}`);
-}; 
+};

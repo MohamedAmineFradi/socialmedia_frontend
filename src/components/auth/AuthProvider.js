@@ -20,15 +20,14 @@ export const useAuth = () => {
 };
 
 export default function AuthProvider({ children }) {
-  const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState(null);
   const [mounted, setMounted] = useState(false);
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
   const user = useSelector(state => state.auth.user);
 
-  // Ensure component is mounted on client
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -40,24 +39,18 @@ export default function AuthProvider({ children }) {
       try {
         setIsLoading(true);
         setError(null);
-        
-        console.log('Initializing Keycloak authentication...');
+
         const authenticated = await authService.init();
-        
+
         if (authenticated) {
-          console.log('User is authenticated with Keycloak');
-          // Extract roles from token and set in Redux user
           const token = authService.token || (authService.keycloak && authService.keycloak.token);
           if (token) {
             const roles = extractRolesFromToken(token);
             dispatch(setUser({ ...authService.user, roles }));
           }
-        } else {
-          console.log('User is not authenticated');
         }
         setIsInitialized(true);
       } catch (error) {
-        console.error('Auth initialization failed:', error);
         setError(error.message || 'Authentication service unavailable');
         setIsInitialized(true);
       } finally {
@@ -73,7 +66,6 @@ export default function AuthProvider({ children }) {
       setError(null);
       await authService.login();
     } catch (error) {
-      console.error('Login failed:', error);
       setError(error.message || 'Login failed. Please try again.');
     }
   };
@@ -87,12 +79,10 @@ export default function AuthProvider({ children }) {
       dispatch(clearComments());
       dispatch(clearReactions());
     } catch (error) {
-      console.error('Logout failed:', error);
       setError(error.message || 'Logout failed.');
     }
   };
 
-  // Stable helper callbacks to prevent re-creation on each render.
   const hasRole = useCallback((role) => {
     return user?.roles?.includes(role);
   }, [user]);
@@ -118,7 +108,6 @@ export default function AuthProvider({ children }) {
     refreshUserRoles,
   };
 
-  // Don't render anything until mounted on client
   if (!mounted) {
     return null;
   }
@@ -143,8 +132,8 @@ export default function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
+      <AuthContext.Provider value={value}>
+        {children}
+      </AuthContext.Provider>
   );
 } 

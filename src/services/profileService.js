@@ -7,7 +7,6 @@ export const getProfileByUserId = async (userId) => {
     return null;
   }
   try {
-    // Use the public endpoint that works for both self and other users
     const { data } = await api.get(`/profiles/find/user/${userId}`);
     console.log('Profile data received:', data);
     return data;

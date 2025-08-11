@@ -26,16 +26,10 @@ export default function UserPostsList() {
     };
   }, []);
 
-  // Utilise le hook Redux pour les posts
   const { posts, loading, handlePublish, handleEditPost, handleDeletePost } = usePosts(userDbId && !loadingUserId ? userDbId : null);
 
   useEffect(() => {
     if (user?.id && !userDbId) {
-      // This case should ideally not happen if useUserDbId is always called
-      // but as a fallback, we can set a default or throw an error.
-      // For now, we'll just ensure userDbId is set if user is available.
-      // If user is available but userDbId is not, it means useUserDbId failed to fetch.
-      // We can add a check here to set a default if needed.
     }
   }, [user, userDbId]);
 

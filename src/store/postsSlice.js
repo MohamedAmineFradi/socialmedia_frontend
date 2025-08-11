@@ -1,11 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getPosts, getUserPosts, addPost as addPostApi, editPost as editPostApi, deletePost as deletePostApi } from '@/services/postService';
 
-// Avoid duplicate fetches if we already have data or a request in flight
 export const fetchGlobalPosts = createAsyncThunk(
   'posts/fetchGlobalPosts',
   async () => {
-    return await getPosts(); // No userId param
+    return await getPosts();
   },
   {
     condition: (_arg, { getState }) => {
@@ -13,7 +12,6 @@ export const fetchGlobalPosts = createAsyncThunk(
       const haveData = (posts.global ?? []).length > 0;
       const hasError = !!posts.error;
       const alreadyLoaded = posts.loadedGlobal;
-      // If loading, have data, already loaded once, or error – skip
       if (posts.loadingGlobal || haveData || alreadyLoaded || hasError) {
         return false;
       }
@@ -22,7 +20,6 @@ export const fetchGlobalPosts = createAsyncThunk(
   }
 );
 
-// Fetch posts for a specific user – skip if cached or in-flight
 export const fetchUserPosts = createAsyncThunk(
   'posts/fetchUserPosts',
   async (rawUserId) => {
@@ -33,7 +30,7 @@ export const fetchUserPosts = createAsyncThunk(
     condition: (rawUserId, { getState }) => {
       const userId = String(rawUserId);
       const { posts } = getState();
-      if (!userId) return false; // invalid arg → skip
+      if (!userId) return false;
 
       const alreadyLoading = posts.loadingByUserId[userId];
       const alreadyHaveData = (posts.byUserId[userId] ?? []).length > 0;
@@ -60,7 +57,7 @@ export const deletePost = createAsyncThunk('posts/deletePost', async ({ postId, 
 
 const initialPostsState = {
   global: [],
-  byUserId: {}, // { [userId]: [posts] }
+  byUserId: {},
   loadingGlobal: false,
   loadedGlobal: false,
   loadingByUserId: {},
@@ -91,7 +88,6 @@ const postsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Global feed
       .addCase(fetchGlobalPosts.pending, (state) => {
         state.loadingGlobal = true;
         state.loadedGlobal = false;
@@ -107,7 +103,6 @@ const postsSlice = createSlice({
         state.loadedGlobal = true;
         state.error = action.error.message;
       })
-      // User posts
       .addCase(fetchUserPosts.pending, (state, action) => {
         const userId = action.meta.arg;
         state.loadingByUserId[userId] = true;
@@ -126,7 +121,6 @@ const postsSlice = createSlice({
         state.loadedByUserId[userId] = true;
         state.error = action.error.message;
       })
-      // Add/Edit/Delete: update both global and user-specific if needed
       .addCase(addPost.fulfilled, (state, action) => {
         const post = action.payload;
         state.global.unshift(post);
@@ -138,10 +132,8 @@ const postsSlice = createSlice({
       })
       .addCase(editPost.fulfilled, (state, action) => {
         const post = action.payload;
-        // Update in global
         const idxGlobal = state.global.findIndex(p => p.id === post.id);
         if (idxGlobal !== -1) state.global[idxGlobal] = post;
-        // Update in user
         const userId = post.userId || post.authorId;
         if (userId && state.byUserId[userId]) {
           const idxUser = state.byUserId[userId].findIndex(p => p.id === post.id);
@@ -155,24 +147,19 @@ const postsSlice = createSlice({
           state.byUserId[userId] = state.byUserId[userId].filter(p => p.id !== postId);
         }
       })
-      // Optimistic update for addReaction
       .addCase(require('@/store/reactionsSlice').addReaction.pending, (state, action) => {
         const { postId, userId, reactionType } = action.meta.arg;
-        // Update in global
         const idxGlobal = state.global.findIndex(p => p.id === postId);
         if (idxGlobal !== -1) {
           const post = state.global[idxGlobal];
-          // Remove previous reaction effect
           if (post.userReaction) {
             if (post.userReaction.type === 'LIKE') post.likes = Math.max(0, (post.likes || 0) - 1);
             if (post.userReaction.type === 'DISLIKE') post.dislikes = Math.max(0, (post.dislikes || 0) - 1);
           }
-          // Add new reaction effect
           if (reactionType === 'LIKE') post.likes = (post.likes || 0) + 1;
           if (reactionType === 'DISLIKE') post.dislikes = (post.dislikes || 0) + 1;
           post.userReaction = { type: reactionType, id: 'optimistic' };
         }
-        // Update in user
         Object.keys(state.byUserId).forEach(uid => {
           const idxUser = state.byUserId[uid]?.findIndex(p => p.id === postId);
           if (idxUser !== -1) {
@@ -187,10 +174,8 @@ const postsSlice = createSlice({
           }
         });
       })
-      // Rollback on addReaction.rejected
       .addCase(require('@/store/reactionsSlice').addReaction.rejected, (state, action) => {
         const { postId } = action.meta.arg;
-        // Refetch or reset userReaction to null (or previous state if you store it)
         const idxGlobal = state.global.findIndex(p => p.id === postId);
         if (idxGlobal !== -1) {
           const post = state.global[idxGlobal];
@@ -204,10 +189,8 @@ const postsSlice = createSlice({
           }
         });
       })
-      // Optimistic update for deleteReaction
       .addCase(require('@/store/reactionsSlice').deleteReaction.pending, (state, action) => {
         const { postId } = action.meta.arg;
-        // Remove userReaction and decrement count
         const idxGlobal = state.global.findIndex(p => p.id === postId);
         if (idxGlobal !== -1) {
           const post = state.global[idxGlobal];
@@ -229,10 +212,7 @@ const postsSlice = createSlice({
           }
         });
       })
-      // Rollback on deleteReaction.rejected
       .addCase(require('@/store/reactionsSlice').deleteReaction.rejected, (state, action) => {
-        // Could refetch or restore previous state if you store it
-        // For now, do nothing (or trigger a refetch elsewhere)
       });
   }
 });

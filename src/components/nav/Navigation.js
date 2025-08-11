@@ -9,7 +9,6 @@ const Navigation = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { isAuthenticated, user, login, logout, isSuperAdmin } = useAuth();
 
-    // Debug logging
     console.log('Navigation - Current user:', user);
     console.log('Navigation - User roles:', user?.roles);
     console.log('Navigation - Is superAdmin:', isSuperAdmin());
@@ -43,7 +42,6 @@ const Navigation = () => {
         }
     ];
 
-    // Add admin link for superAdmin users
     const adminItem = {
         icon: "👑",
         label: "Admin",

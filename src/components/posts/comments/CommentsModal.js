@@ -13,7 +13,6 @@ export default function CommentsModal({ open, onClose, post, currentUserId }) {
   const [editingValue, setEditingValue] = useState("");
   const [deleteId, setDeleteId] = useState(null);
 
-  // Utilise le hook Redux pour les commentaires
   const { comments, loading, handleAddComment, handleEditComment, handleDeleteComment } = useComments(post?.id, currentUserId);
 
   if (!open) return null;

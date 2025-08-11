@@ -7,6 +7,5 @@ export function mapCommentResponseToUI(comment) {
     userId: comment.userId,
     content: comment.content,
     createdAt: comment.createdAt,
-    // Add more fields as needed
   };
 } 

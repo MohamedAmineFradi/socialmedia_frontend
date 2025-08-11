@@ -25,7 +25,6 @@ export const editComment = createAsyncThunk(
   'comments/editComment',
   async ({ commentId, userId, commentData, postId }) => {
     const updated = await editCommentApi(commentId, userId, commentData);
-    // Attach postId for reducer
     return { ...updated, postId };
   }
 );
@@ -36,7 +35,6 @@ export const deleteComment = createAsyncThunk(
     const state = getState();
     const finalUserId = userId || state.auth.user?.id;
     await deleteCommentApi(commentId, finalUserId);
-    // Return both commentId and postId for reducer
     return { commentId, postId };
   }
 );
@@ -44,7 +42,7 @@ export const deleteComment = createAsyncThunk(
 const commentsSlice = createSlice({
   name: 'comments',
   initialState: {
-    byPost: {}, // { [postId]: { items: [], loading: false, error: null } }
+    byPost: {}
   },
   reducers: {
     clearComments(state) {

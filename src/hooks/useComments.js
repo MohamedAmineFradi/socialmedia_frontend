@@ -4,7 +4,6 @@ import { useEffect, useRef, useMemo } from 'react';
 
 export default function useComments(postId, currentUserId, refreshKey) {
   const dispatch = useDispatch();
-  // Memoize the empty array and fallback object
   const EMPTY_ARRAY = useMemo(() => [], []);
   const EMPTY_STATE = useMemo(() => ({ items: EMPTY_ARRAY, loading: false, error: null }), [EMPTY_ARRAY]);
   const commentsState = useSelector(state => state.comments.byPost[postId] || EMPTY_STATE);
@@ -16,7 +15,6 @@ export default function useComments(postId, currentUserId, refreshKey) {
     const postChanged = prevPostId.current !== postId;
     prevPostId.current = postId;
 
-    // Ne fetch que si le post change OU si aucun commentaire en cache
     const cached = comments?.length > 0;
     if (postId && (postChanged || !cached || refreshKey !== undefined)) {
       dispatch(fetchComments(postId));

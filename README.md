@@ -1,124 +1,144 @@
-# Social Media Frontend
+# Social Media Platform - Frontend
 
-A modern, modular, and secure frontend for a social media application, built with Next.js 15, React, Tailwind CSS, and Keycloak authentication. Designed for extensibility, maintainability, and seamless integration with the backend API.
+## Modern Social Networking Application
 
----
+A full-featured social media platform with real-time messaging, content sharing, and user engagement features. Built with Next.js 15, React 18, and Tailwind CSS, secured with Keycloak authentication.
 
-## Table of Contents
-- [Features](#features)
-- [Architecture](#architecture)
-- [Security & Authentication](#security--authentication)
-- [API Integration](#api-integration)
-- [Directory Structure](#directory-structure)
-- [Getting Started](#getting-started)
-- [Extensibility & Best Practices](#extensibility--best-practices)
-- [Learn More](#learn-more)
+![Home Interface](./public/interface_acceuil.png)
 
----
+## 📸 Screenshots
 
-## Features
-- User authentication (Keycloak, OAuth2/OIDC, PKCE, silent SSO)
-- Responsive UI with Tailwind CSS
-- Modular, feature-based component structure
-- CRUD for posts, comments, reactions, and profiles
-- Real-time notifications and chat (if backend supports)
-- API consumption from a secure Spring Boot backend
-- Modern UX: modals, animations, mobile-ready
-- Role-based UI (superAdmin, user)
+### News Feed
+![News Feed](/public/interfac_feeds.png)
+### User SignIN/SignUP
+![User SignIN](./public/interface_signin.png)
+![User SignUP](./public/interface_signup.png)
 
----
+### User Profile
+![User Profile View](/public/interface_view_profile.png)
+![User Profile Edit](/public/interface_change_profile.png)
 
-## Architecture
-- **Next.js 15 / React 18 / Node 22**
-- **Tailwind CSS** for rapid, consistent styling
-- **Feature/domain-based component organization** for maximum modularity
-- **Hooks**: useState, useEffect, custom hooks for auth, posts, notifications, etc.
-- **State management**: Local state (hooks), Zustand or Context API for auth/session
-- **API layer**: All backend calls via a centralized service (see `src/services/`)
-- **Authentication**: Keycloak JS adapter, SSR-safe, token refresh, role sync
 
----
+### User Profile
+![Messages](./public/interface_messages.png)
 
-## Security & Authentication
-- **Keycloak**: Handles login, logout, token refresh, and role management
-- **PKCE**: Secure OAuth2 flow for SPAs
-- **Silent SSO**: Seamless user experience
-- **Role-based UI**: Only show admin features to superAdmin users
-- **Secure API calls**: All requests include JWT in Authorization header
+## ✨ Key Features
 
----
+- **User Authentication**: Secure login via Keycloak with OAuth2/OIDC, PKCE, and silent SSO
+- **Real-Time Messaging**: WebSocket-powered chat with:
+  - One-to-one conversations
+  - Optimistic UI message delivery
+  - Error handling with user notifications
+  - Conversation history persistence
+- **Content Management**:
+  - Post creation/editing/deletion
+  - Comments and reactions
+  - Media uploads (images/videos)
+- **User Engagement**:
+  - Follow/unfollow users
+  - Notifications system
+  - User profile customization
+- **Modern UI**:
+  - Responsive Tailwind CSS design
+  - Animated transitions
+  - Dark/light mode
+  - Role-based interfaces (user/admin)
+- **Intuitive Navigation**:
+  - Mobile-friendly bottom navigation bar
+  - Desktop sidebar navigation
+  - Admin dashboard access for super users
 
-## API Integration
-- **Backend**: Connects to the Spring Boot API (see backend README for endpoints)
-- **Swagger**: Use backend Swagger UI for API exploration
-- **Error handling**: Graceful error messages, loading states, and retry logic
-- **User/Session sync**: After login, fetch user info from `/api/users/me` to get roles and stats
+## 🏗️ Architecture
 
----
+This frontend application follows a modern, scalable architecture:
 
-## Directory Structure
+- **Framework**: Next.js 15 with App Router for optimal performance
+- **State Management**: React Context API for global state, component-level state for local data
+- **Styling**: Tailwind CSS for utility-first styling with custom theme configuration
+- **Authentication**: Keycloak integration with secure token handling
+- **Real-time Communication**: WebSocket for instant messaging updates
+- **API Integration**: RESTful services with automatic error handling and retry logic
 
-The `src/components` directory is organized by feature/domain for maximum modularity and maintainability. Each folder contains all UI and logic for that domain. Only truly generic UI elements are in `ui/`, and layouts are in `layouts/`.
+## 🚀 Getting Started
 
-```
-components/
-  ui/                # Pure, reusable UI atoms/molecules (Button, Footer, Logo, etc.)
-  layouts/           # Page or section layouts (MainLayout, etc.)
-  posts/             # All post and comment-related components
-  profile/           # Profile page, header, stats, sidebar, etc.
-  sidebar/           # Sidebars (WhoToFollow, RightSidebar, etc.)
-  nav/               # Navigation (Navigation.js, IconRail.js, etc.)
-  notifications/     # Notification drawer, notification item, etc.
-  chat/              # Messaging/DM drawer, chat bubbles, etc.
-  forms/             # Generic, reusable form components (if any)
+1. **Install dependencies**:
+```bash
+npm install
+# or
+yarn install
 ```
 
-**Guidelines:**
-- Group by feature/domain, not by type.
-- Encapsulate all feature UI/logic in its folder.
-- Only generic UI in `ui/`.
-- No cross-feature imports except through `ui/` or `layouts/`.
+2. **Configure environment**:
 
----
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8080
+KEYCLOAK_URL=http://localhost:8081
+KEYCLOAK_REALM=social-media
+KEYCLOAK_CLIENT_ID=frontend-app
+```
 
-## Getting Started
+3. **Run development server**:
+```bash
+npm run dev
+# or
+yarn dev
+```
 
-1. Install dependencies:
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
-2. Run the development server:
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
-3. Open [http://localhost:3000](http://localhost:3000) to view the app.
-4. Configure Keycloak and backend API URLs in your environment variables if needed.
+4. **Open in browser**:
+http://localhost:3000
 
----
+## 🧩 Project Structure
 
-## Extensibility & Best Practices
-- **Modular**: Add new features by creating new folders in `components/` and `services/`
-- **SOLID**: Keep logic and UI separated, use hooks for business logic
-- **Type safety**: Use TypeScript for new code if possible
-- **Testing**: Add unit and integration tests for components and hooks
-- **Accessibility**: Use semantic HTML and ARIA attributes
-- **Performance**: Use React.memo, lazy loading, and code splitting
-- **Security**: Never expose secrets in the frontend, always validate JWTs on the backend
+```
+src/
+├── components/          # Feature-based components
+│   ├── auth/            # Authentication flows
+│   ├── posts/           # Post management
+│   │   └── comments/    # Comment system
+│   ├── profile/         # User profiles
+│   ├── chat/            # Real-time messaging
+│   ├── notifications/   # Notification system
+│   ├── nav/             # Navigation components
+│   ├── layouts/         # Page layouts
+│   └── ui/              # Reusable UI elements
+├── services/            # API service layer
+│   └── auth/            # Authentication services
+├── contexts/            # Application contexts
+├── hooks/               # Custom React hooks
+├── pages/               # Next.js page routes
+├── styles/              # Global styles
+└── utils/               # Utility functions
+```
 
----
+## 🔧 Development Practices
 
-## Learn More
+- **Modular Architecture**: Feature-based component organization
+- **State Management**: Context API for shared state
+- **API Layer**: Centralized service classes for backend communication
+- **Security**: JWT authentication for all API requests
+- **Performance**: Code splitting, memoization, and lazy loading
+- **Responsive Design**: Mobile-first approach with Tailwind CSS
+- **Accessibility**: WCAG 2.1 compliant components
+
+## 🌐 API Integration
+
+The frontend integrates with a Spring Boot backend providing:
+
+- REST API endpoints for all social operations
+- WebSocket support for real-time messaging
+- Swagger documentation at `/swagger-ui.html`
+
+## 📚 Learning Resources
+
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS](https://tailwindcss.com/docs)
-- [Keycloak JS Adapter](https://www.keycloak.org/docs/latest/securing_apps/#_javascript_adapter)
 - [React](https://react.dev/)
-- [Zustand](https://docs.pmnd.rs/zustand/getting-started/introduction) (if used)
-- [Material UI](https://mui.com/) / [Flowbite](https://flowbite-react.com/) for UI components
+- [Keycloak JS Adapter](https://www.keycloak.org/docs/latest/securing_apps/#_javascript_adapter)
 
----
+## 🛡️ Security Features
 
-**This frontend is production-ready, modular, and easy to extend for mobile, admin, or new social features.**
+- Keycloak authentication with PKCE
+- JWT token management
+- Role-based access control
+- Secure API communication
+- Input validation and sanitization

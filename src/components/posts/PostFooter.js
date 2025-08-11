@@ -13,7 +13,7 @@ export default function PostFooter({
   onLongPress,
   onClosePicker,
   currentUserId,
-  onCommentsClick, // new prop
+  onCommentsClick,
 }) {
   return (
     <div className="flex items-center justify-between mt-4">

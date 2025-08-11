@@ -2,11 +2,9 @@
 
 import { useState, useMemo } from "react";
 
-/* ---------- reusable hook ---------- */
 function useSearch(data, keys = ["name", "username"]) {
   const [query, setQuery] = useState("");
 
-  // Memo-compute results whenever data or query changes
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return data;
@@ -19,9 +17,7 @@ function useSearch(data, keys = ["name", "username"]) {
   return { query, setQuery, filtered };
 }
 
-/* ---------- main component ---------- */
 export default function WhoToFollow() {
-  // Mock suggestions (swap with your API data)
   const [suggested, setSuggested] = useState([
     {
       id: 1,

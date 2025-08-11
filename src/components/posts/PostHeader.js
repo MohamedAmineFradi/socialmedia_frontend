@@ -14,7 +14,6 @@ export default function PostHeader({
 }) {
   const [avatarError, setAvatarError] = useState(false);
   
-  // Extract data from post and authorProfile
   const author = authorProfile?.name || post.authorName || "Unknown User";
   const avatar = authorProfile?.avatar;
   const username = authorProfile?.username || post.authorUsername;
@@ -31,12 +30,10 @@ export default function PostHeader({
     );
   }
   
-  // Calculate minutes ago from post creation date
   const minutesAgo = post.createdAt 
     ? Math.floor((Date.now() - new Date(post.createdAt).getTime()) / (1000 * 60))
     : 0;
 
-  // Fallback avatar URL using UI Avatars service
   const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(author)}&background=009ddb&color=fff&size=40`;
 
   const handleAvatarError = () => {

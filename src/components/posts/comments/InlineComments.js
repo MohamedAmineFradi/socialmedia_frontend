@@ -10,8 +10,6 @@ export default function InlineComments({ post, currentUserId, isSuperAdmin, refr
   const [editingValue, setEditingValue] = useState("");
   const [deleteId, setDeleteId] = useState(null);
 
-  // Utilise le hook Redux pour les commentaires
-  // Add refreshKey as a dependency to force refetch
   const { comments, loading, handleAddComment, handleEditComment, handleDeleteComment } = useComments(post?.id, currentUserId, refreshKey);
 
   async function handleAdd(text) {
@@ -36,11 +34,7 @@ export default function InlineComments({ post, currentUserId, isSuperAdmin, refr
       await handleEditComment(commentId, newText);
       setEditingId(null);
       setEditingValue("");
-      // Optimistically update UI: Redux state is updated by the fulfilled reducer
-      // No need to refetch unless error
-      // console.log('Comment edited successfully, UI updated via Redux');
     } catch (err) {
-      console.error('Failed to edit comment, refetching...', err);
       if (typeof window !== 'undefined' && window.dispatchEvent) {
         window.dispatchEvent(new CustomEvent('commentsUpdated', { detail: { postId: post.id } }));
       }

@@ -43,11 +43,9 @@ export default function PostCard({
       onEdit(post.id, newContent)
         .then(() => {
           setIsEditing(false);
-          // Optimistically update UI: Redux state is updated by the fulfilled reducer
-          // console.log('Post edited successfully, UI updated via Redux');
         })
         .catch((err) => {
-          console.error('Failed to edit post, consider refetching...', err);
+          console.error('Failed to edit post', err);
         });
     }
   }

@@ -14,7 +14,7 @@ export const deleteReaction = createAsyncThunk('reactions/deleteReaction', async
 const reactionsSlice = createSlice({
   name: 'reactions',
   initialState: {
-    pending: {}, // { [postId]: boolean }
+    pending: {}, 
     error: null,
   },
   reducers: {

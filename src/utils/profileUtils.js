@@ -8,6 +8,5 @@ export function mapProfileResponseToUI(profile) {
     avatar: profile.avatar,
     bio: profile.bio,
     username: profile.username,
-    // Add more fields as needed
   };
 } 

@@ -3,22 +3,18 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import RightSidebar from "../sidebar/RightSidebar";
-import ChatDrawer from "../chat/ChatDrawer";
 import WhoToFollow from "../sidebar/WhoToFollow";
 import Navigation from "@/components/nav/Navigation";
 import Footer from "@/components/ui/Footer";
-import BackendStatus from "@/components/ui/BackendStatus";
 
 export default function MainLayout({ children }) {
   const pathname = usePathname();
 
   const isHome = pathname === "/";
 
-  // If we're on the home page, just render children (home page)
   if (isHome) {
     return (
       <>
-        <BackendStatus />
         {children}
       </>
     );
@@ -26,7 +22,6 @@ export default function MainLayout({ children }) {
 
   return (
       <>
-    <BackendStatus />
     <div className="bg-gray-100 text-sm lg:grid lg:grid-cols-[280px_1fr_300px] lg:gap-6 lg:h-screen lg:overflow-hidden">
       <Navigation/>
 
@@ -39,7 +34,6 @@ export default function MainLayout({ children }) {
         <WhoToFollow />
       </aside>
 
-      <ChatDrawer />
     </div>
 
     {!isHome && <Footer />}

@@ -21,10 +21,8 @@ export default function Feed() {
   const [openComments, setOpenComments] = useState({});
   const [commentsRefresh, setCommentsRefresh] = useState({});
 
-  // Utilise le hook Redux pour les posts
-  const { posts, loading, handlePublish, handleEditPost, handleDeletePost } = usePosts(null); // global feed
+  const { posts, loading, handlePublish, handleEditPost, handleDeletePost } = usePosts(null);
 
-  // Listen for comment button events
   useEffect(() => {
     function handleToggleComments(e) {
       const { postId } = e.detail;
@@ -42,13 +40,6 @@ export default function Feed() {
     };
   }, []);
 
-  // Remove refetchPosts and its usage
-  // const refetchPosts = useCallback(() => {
-  //   window.location.reload();
-  // }, []);
-
-  // Example: Call refetchPosts after a post is edited/deleted
-  // Pass refetchPosts as a prop to PostCard and call it after edit/delete
 
   useEffect(() => {
     import('long-press-event');

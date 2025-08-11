@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import CommentForm from "./CommentForm";
 
 export default function CommentModal({ open, onClose, onSubmit, initialValue }) {
-  // Prevent background scroll when modal is open
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
