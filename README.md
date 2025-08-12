@@ -10,7 +10,7 @@ A full-featured social media platform with real-time messaging, content sharing,
 
 ### News Feed
 ![News Feed](/public/interfac_feeds.png)
-### User SignIN/SignUP
+### User SignIN/SignUP with Keycloakify 
 ![User SignIN](./public/interface_signin.png)
 ![User SignUP](./public/interface_signup.png)
 
@@ -33,15 +33,10 @@ A full-featured social media platform with real-time messaging, content sharing,
 - **Content Management**:
   - Post creation/editing/deletion
   - Comments and reactions
-  - Media uploads (images/videos)
 - **User Engagement**:
-  - Follow/unfollow users
-  - Notifications system
   - User profile customization
 - **Modern UI**:
   - Responsive Tailwind CSS design
-  - Animated transitions
-  - Dark/light mode
   - Role-based interfaces (user/admin)
 - **Intuitive Navigation**:
   - Mobile-friendly bottom navigation bar
@@ -100,12 +95,13 @@ src/
 │   ├── notifications/   # Notification system
 │   ├── nav/             # Navigation components
 │   ├── layouts/         # Page layouts
+│   ├── sidebar/         # global sidebar
 │   └── ui/              # Reusable UI elements
 ├── services/            # API service layer
 │   └── auth/            # Authentication services
 ├── contexts/            # Application contexts
 ├── hooks/               # Custom React hooks
-├── pages/               # Next.js page routes
+├── store/               # Redux Store
 ├── styles/              # Global styles
 └── utils/               # Utility functions
 ```
@@ -118,7 +114,6 @@ src/
 - **Security**: JWT authentication for all API requests
 - **Performance**: Code splitting, memoization, and lazy loading
 - **Responsive Design**: Mobile-first approach with Tailwind CSS
-- **Accessibility**: WCAG 2.1 compliant components
 
 ## 🌐 API Integration
 

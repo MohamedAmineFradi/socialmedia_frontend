@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import useUserDbId from "@/hooks/useUserDbId";
 import useProfile from "@/hooks/useProfile";
 import { useEffect } from "react";
@@ -56,7 +57,9 @@ export default function ProfileHeader() {
       {/* Avatar + Nom */}
       <div className="flex items-center gap-4 mb-4">
         {profile.avatar ? (
-          <img src={profile.avatar} alt="avatar" className="w-20 h-20 rounded-full object-cover" />
+          <div className="w-20 h-20 rounded-full overflow-hidden">
+            <Image src={profile.avatar} alt="avatar" width={80} height={80} className="w-20 h-20 object-cover" unoptimized />
+          </div>
         ) : (
           <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-2xl font-bold text-[#009ddb]">
             {profile.name?.charAt(0) || "?"}

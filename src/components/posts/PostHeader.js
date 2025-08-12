@@ -1,5 +1,7 @@
 "use client";
 
+import Link from 'next/link';
+import Image from 'next/image';
 import PropTypes from "prop-types";
 import { useState } from "react";
 
@@ -43,18 +45,26 @@ export default function PostHeader({
   return (
     <header className="flex items-center gap-3 mb-2">
       {avatar && !avatarError ? (
-        <img
-          src={avatar}
-          alt={author}
-          className="w-10 h-10 rounded-full object-cover bg-white"
-          onError={handleAvatarError}
-        />
+        <div className="w-10 h-10 rounded-full overflow-hidden bg-white">
+          <Image
+            src={avatar}
+            alt={author}
+            width={40}
+            height={40}
+            className="w-10 h-10 object-cover"
+            onError={handleAvatarError}
+          />
+        </div>
       ) : (
-        <img
-          src={fallbackAvatar}
-          alt={author}
-          className="w-10 h-10 rounded-full object-cover bg-white"
-        />
+        <div className="w-10 h-10 rounded-full overflow-hidden bg-white">
+          <Image
+            src={fallbackAvatar}
+            alt={author}
+            width={40}
+            height={40}
+            className="w-10 h-10 object-cover"
+          />
+        </div>
       )}
       <div>
         <h4 className="font-bold text-[#009ddb]">{author}</h4>

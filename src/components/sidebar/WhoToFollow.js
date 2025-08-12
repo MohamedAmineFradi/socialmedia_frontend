@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { useState, useMemo } from "react";
 
 function useSearch(data, keys = ["name", "username"]) {
@@ -23,42 +24,42 @@ export default function WhoToFollow() {
       id: 1,
       name: "Jennifer Aniston",
       username: "jen_aniston",
-      avatar: "https://duckduckgo.com/i/7417751969c0e845.jpg",
+      avatar: "/avatars/jennifer.jpg", // Put images in public/avatars/
       followed: false,
     },
     {
       id: 2,
       name: "Courteney Cox",
       username: "courteneycoxofficial",
-      avatar: "https://duckduckgo.com/i/da6ce57098a7bd35.jpg",
+      avatar: "/avatars/courteney.jpg",
       followed: false,
     },
     {
       id: 3,
       name: "Lisa Kudrow",
       username: "lisa.kudrow",
-      avatar: "https://duckduckgo.com/i/a7b5e2645d8b3427.jpg",
+      avatar: "/avatars/lisa.jpg",
       followed: false,
     },
     {
       id: 4,
       name: "Matt LeBlanc",
       username: "mattleblanc",
-      avatar: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.pinimg.com%2Foriginals%2F02%2F0c%2Fa2%2F020ca2e252ea1334767e47b4f15cd6ea.jpg&f=1&nofb=1&ipt=4ca4c0c74fe0f80fcb6e82efcdf5e477811836afaf1070b8e32594f75cc68808",
+      avatar: "/avatars/matt.jpg",
       followed: false,
     },
     {
       id: 5,
       name: "Matthew Perry",
       username: "matthewperry",
-      avatar: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.dlJgA-DP9JS8VA0fcYUhwwHaJb%3Fpid%3DApi&f=1&ipt=f5be0386e2bc5a17e4939fc47a387a8fa5f0affa3af0c722cce03336cfa36238&ipo=images",
+      avatar: "/avatars/matthew.jpg",
       followed: false,
     },
     {
       id: 6,
       name: "David Schwimmer",
       username: "david_schwimmer",
-      avatar: "https://duckduckgo.com/i/0bbc05d0a441eee4.jpg",
+      avatar: "/avatars/david.jpg",
       followed: false,
     },
   ]);
@@ -99,11 +100,20 @@ export default function WhoToFollow() {
                   <li key={id} className="flex items-center justify-between">
                     {/* User info */}
                     <div className="flex items-center">
-                      <img
-                          src={avatar}
-                          alt={name}
-                          className="h-10 w-10 rounded-full object-cover"
-                      />
+                      <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+                        <Image
+                            src={avatar}
+                            alt={name}
+                            width={40}
+                            height={40}
+                            className="h-10 w-10 object-cover"
+                            onError={(e) => {
+                              // Fallback to initials if image fails
+                              e.target.style.display = 'none';
+                            }}
+                        />
+                      </div>
+
                       <div className="ml-3">
                         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                           {name}

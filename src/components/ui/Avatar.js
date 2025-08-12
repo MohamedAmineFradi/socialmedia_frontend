@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Image from 'next/image';
 import PropTypes from 'prop-types';
 
 export default function Avatar({ 
@@ -22,12 +23,16 @@ export default function Avatar({
 
   if (src && !error) {
     return (
-      <img 
-        src={src}
-        alt={name}
-        onError={handleError}
-        className={`rounded-full object-cover border border-gray-200 ${sizeClasses[size]} ${className}`}
-      />
+      <div className={`rounded-full object-cover border border-gray-200 ${sizeClasses[size]} ${className} overflow-hidden`}>
+        <Image 
+          src={src}
+          alt={name}
+          width={size === 'sm' ? 32 : size === 'md' ? 40 : 64}
+          height={size === 'sm' ? 32 : size === 'md' ? 40 : 64}
+          onError={handleError}
+          className="w-full h-full object-cover"
+        />
+      </div>
     );
   }
 

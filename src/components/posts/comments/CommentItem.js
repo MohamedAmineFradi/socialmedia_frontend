@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import PropTypes from "prop-types";
 import { useState } from "react";
 import useProfile from "@/hooks/useProfile";
@@ -58,13 +59,16 @@ export default function CommentItem({
 
   return (
     <div className="flex items-start gap-3">
-      <img
-        src={avatarUrl}
-        alt={displayName}
-        className="w-8 h-8 rounded-full object-cover bg-white/20 border border-white/30"
-        loading="lazy"
-        onError={handleAvatarError}
-      />
+      <div className="w-8 h-8 rounded-full overflow-hidden bg-white/20 border border-white/30">
+        <Image
+          src={avatarUrl}
+          alt={displayName}
+          width={32}
+          height={32}
+          className="w-8 h-8 object-cover"
+          onError={handleAvatarError}
+        />
+      </div>
       <div className="flex-1">
         <div className="flex items-center justify-between">
           <div>

@@ -59,7 +59,7 @@ export default function AuthProvider({ children }) {
     };
 
     initializeAuth();
-  }, [mounted]);
+  }, [mounted, dispatch]);
 
   const handleLogin = async () => {
     try {

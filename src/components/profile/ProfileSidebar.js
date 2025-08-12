@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -73,11 +74,15 @@ export default function ProfileSidebar() {
     <div className="bg-[#009ddb] rounded-2xl shadow p-6 flex flex-col items-center border border-[#009ddb]/10">
       {/* Avatar */}
       {profile?.avatar ? (
-        <img
-          src={profile.avatar}
-          alt="Profile avatar"
-          className="w-20 h-20 rounded-full object-cover mb-3 bg-white"
-        />
+        <div className="w-20 h-20 rounded-full overflow-hidden mb-3 bg-white">
+          <Image
+            src={profile.avatar}
+            alt="Profile avatar"
+            width={80}
+            height={80}
+            className="w-20 h-20 object-cover"
+          />
+        </div>
       ) : (
         <div className="w-20 h-20 rounded-full bg-white mb-3 flex items-center justify-center">
           <span className="text-2xl font-bold text-[#009ddb]">
